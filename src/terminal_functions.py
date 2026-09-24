@@ -11,6 +11,10 @@ import os
 import shutil
 import re
 
+import pyfiglet
+import pyautogui
+import global_context
+
 
 user32 = ctypes.windll.user32
 
@@ -29,6 +33,17 @@ VK_NEXT = 0x22       # Page Down
 VK_L = 0x4C
 
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+
+class RECT(ctypes.Structure):
+    _fields_ = [
+        ("left", ctypes.c_long),
+        ("top", ctypes.c_long),
+        ("right", ctypes.c_long),
+        ("bottom", ctypes.c_long),
+    ]
+
+
+
 
 
 def image_to_ascii(path, columns, width_ratio=2.2, full_color=False, monochrome=False):
@@ -66,6 +81,38 @@ def image_to_ascii(path, columns, width_ratio=2.2, full_color=False, monochrome=
     if monochrome:
         text = ANSI_ESCAPE.sub('', text)
     return text
+
+def image_to_ascii_from_context(path, columns, context):
+    return image_to_ascii(path, columns,
+                            full_color=context.settings.full_color, monochrome=context.settings.monochrome_assets)
+
+
+
+
+def toggle_terminal_size():
+    pyautogui.press("f11")
+
+def terminal_is_maximized():
+    user32 = ctypes.windll.user32
+    hwnd = user32.GetForegroundWindow()
+
+    # Normal Windows maximize
+    if user32.IsZoomed(hwnd):
+        return True
+
+    # F11 fullscreen
+    rect = RECT()
+    user32.GetWindowRect(hwnd, ctypes.byref(rect))
+
+    screen_width = user32.GetSystemMetrics(0)
+    screen_height = user32.GetSystemMetrics(1)
+
+    return (
+        rect.left == 0 and
+        rect.top == 0 and
+        rect.right == screen_width and
+        rect.bottom == screen_height
+    )
 
 def press_key(vk):
     user32.keybd_event(vk, 0, 0, 0)
@@ -195,3 +242,15 @@ def color_reset():
 
 def clear():
     os.system("cls")
+
+"""
+ascii fonts
+"""
+
+def ansi_shadow(text, width=200):
+    shadow_text = pyfiglet.figlet_format(
+        text,
+        font="ansi_shadow",
+        width=width
+    )
+    return shadow_text
