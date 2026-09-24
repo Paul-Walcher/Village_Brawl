@@ -1,6 +1,7 @@
 """
 Defines several functions for printing.
 """
+import os
 import random
 
 import terminal_functions as terminal
@@ -37,8 +38,9 @@ def print_new_game_or_save_selection(context, selection_state):
         print()
 
     terminal.clear()
+    terminal.hide_cursor(context)
 
-    terminal.zoom_to(context, 10)
+    terminal.zoom_in(context, 5)
 
     if selection_state == states.New_Game_Or_Save_Selection_Enum.New_Game:
         print_highlighted("New Game")

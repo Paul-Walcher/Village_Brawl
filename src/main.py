@@ -14,7 +14,7 @@ colorama.init()
 if not terminal.terminal_is_maximized():
     terminal.toggle_terminal_size()
 
-logic.intro(context)
+context = logic.intro(context)
 #now the selection of save or new game
 with Zoomrestore(context):
     logic.new_game_or_save_selection(context)

@@ -259,6 +259,15 @@ def color_reset():
 def clear():
     os.system("cls")
 
+def hide_cursor(context):
+    print("\033[?25l", end="")
+    context.cursor_visible = False
+
+
+def show_cursor(context):
+    print("\033[?25h", end="")
+    context.cursor_visible = True
+
 """
 ascii fonts
 """

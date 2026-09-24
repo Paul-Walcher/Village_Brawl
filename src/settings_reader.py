@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Callable
 
 import json
+import sys
 
 from global_context import Global_Context
 
@@ -30,5 +31,7 @@ def read_settings(global_context: Global_Context):
     except Exception as e:
 
         print(5*"\n"+"Could not load settings. Aborting..."+"\n"*5)
+        sys.exit()
+
 
     return local_context

@@ -5,6 +5,7 @@ logic.
 import os
 import sys
 import random
+import time
 
 import constants
 import global_context
@@ -69,6 +70,8 @@ def intro(context):
 
     input()
 
+    return context
+
 def finish(context):
 
     #clear text
@@ -103,6 +106,8 @@ def new_game_or_save_selection(context):
 
     current_encoding = 0
 
+    terminal.zoom_to(context, 5)
+
 
     graphics.print_new_game_or_save_selection(context, selection_state)
 
@@ -118,7 +123,8 @@ def new_game_or_save_selection(context):
             current_encoding -= 1
             current_encoding %= 3
             selection_state = num_encoding[current_encoding]
-            graphics.print_new_game_or_save_selection(context, selection_state)
+            with Zoomrestore(context):
+                graphics.print_new_game_or_save_selection(context, selection_state)
 
         if not keyboard.is_pressed("w") and w_pressed:
             w_pressed = False
@@ -128,7 +134,8 @@ def new_game_or_save_selection(context):
             current_encoding += 1
             current_encoding %= 3
             selection_state = num_encoding[current_encoding]
-            graphics.print_new_game_or_save_selection(context, selection_state)
+            with Zoomrestore(context):
+                graphics.print_new_game_or_save_selection(context, selection_state)
 
         if not keyboard.is_pressed("s") and s_pressed:
             s_pressed = False

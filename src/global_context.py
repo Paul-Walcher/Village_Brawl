@@ -35,6 +35,7 @@ class Global_Context:
 
         self.settings = Settings()
         self.current_zoom = 0 #positive means zoomed in, negative means zoomed out
+        self.cursor_visible = True
 
     def copy(self):
 
@@ -43,6 +44,6 @@ class Global_Context:
         settings_copy = self.settings.copy()
         context_copy.settings = settings_copy
         context_copy.current_zoom = self.current_zoom
-
+        context_copy.cursor_visible = self.cursor_visible
 
         return context_copy
