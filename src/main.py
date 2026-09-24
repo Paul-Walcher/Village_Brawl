@@ -1,18 +1,44 @@
+import pyfiglet
+from pyfiglet import Figlet
 
-"""
-Village Brawl
-"""
 
-import assets.ascii_assets as ascii_assets
-import terminal_functions as terminal
-import colorama
+def main():
+    f = Figlet()
 
-colorama.init()
+    # Fonts whose names commonly indicate block/banner styles
+    keywords = (
+        "block",
+        "banner",
+        "big",
+        "doom",
+        "standard",
+        "small",
+        "heavy",
+        "bold",
+        "slant",
+        "shadow",
+        "univers",
+    )
 
-terminal.clear()
-terminal.text_rgb(255, 0, 0)
-terminal.print_centered(ascii_assets.Village_Brawl_Headline)
-terminal.color_reset()
-print("\n"*5)
-text = terminal.image_to_ascii(r"C:\Users\pycpp\OneDrive\Dokumente\MEGA\Village_Brawl\V1.0.0\Assets\Coin.png", 100)
-terminal.print_centered(text, full=True)
+    fonts = [
+        font for font in f.getFonts()
+        if any(keyword in font.lower() for keyword in keywords)
+    ]
+
+    print(f"Found {len(fonts)} candidate fonts.\n")
+
+    for font in fonts:
+        print("=" * 80)
+        print(f"FONT: {font}")
+        print("=" * 80)
+
+        try:
+            print(pyfiglet.figlet_format("Village Brawl", font=font))
+        except Exception:
+            pass
+
+        input("Press ENTER for next font...")
+
+
+if __name__ == "__main__":
+    main()

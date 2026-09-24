@@ -31,7 +31,7 @@ VK_L = 0x4C
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
 
-def image_to_ascii(path, columns, width_ratio=2.2, full_color=False):
+def image_to_ascii(path, columns, width_ratio=2.2, full_color=False, monochrome=False):
     art = ascii_magic.from_image(path)
 
     characters = art.to_character_list(
@@ -62,7 +62,10 @@ def image_to_ascii(path, columns, width_ratio=2.2, full_color=False):
         line += "\033[0m"
         lines.append(line)
 
-    return "\n".join(lines)
+    text = "\n".join(lines)
+    if monochrome:
+        text = ANSI_ESCAPE.sub('', text)
+    return text
 
 def press_key(vk):
     user32.keybd_event(vk, 0, 0, 0)
@@ -138,7 +141,7 @@ def visible_length(text):
     return len(ANSI_ESCAPE.sub('', text))
 
 
-def print_centered(text, full=False):
+def print_centered(text, full=False, shift=0):
     terminal_width = shutil.get_terminal_size().columns
 
     lines = text.splitlines()
@@ -149,10 +152,10 @@ def print_centered(text, full=False):
         default=0
     )
 
-    # Center the whole block
+    # Center the whole block, then apply the shift
     left_padding = max(
         0,
-        (terminal_width - max_width) // 2
+        (terminal_width - max_width) // 2 + shift
     )
 
     for line in lines:
