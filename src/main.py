@@ -5,18 +5,13 @@ import constants
 import logic
 from logic import Zoomrestore
 import global_context
+from gamestatehandler import GamestateHandler
 
-
-context = global_context.Global_Context()
 
 colorama.init()
 
 if not terminal.terminal_is_maximized():
     terminal.toggle_terminal_size()
 
-context = logic.intro(context)
-#now the selection of save or new game
-with Zoomrestore(context):
-    logic.new_game_or_save_selection(context)
-
-logic.finish(context)
+handler = GamestateHandler()
+handler.run()

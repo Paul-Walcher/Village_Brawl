@@ -5,7 +5,6 @@ logic.
 import os
 import sys
 import random
-import time
 
 import constants
 import global_context
@@ -14,6 +13,7 @@ import terminal_functions as terminal
 import settings_reader
 import keyboard
 import states
+from states import Gamestates
 
 
 class Zoomrestore:
@@ -51,12 +51,16 @@ class Zoomrestore:
         Zoomrestore.restore_zoom(self.context, self.snapshot)
         return False
 
-def intro(context):
+def intro(gamestatehandler):
+
+    context = gamestatehandler.context
 
     terminal.clear()
 
     #reading settings
     context = settings_reader.read_settings(context)
+
+    gamestatehandler.context = context
 
     files = list(os.listdir(constants.STANDARD_IMAGE_PATH))
     files = [file for file in files if file.endswith(".png") or file.endswith(".jpg")  or file.endswith(".jpeg")]
@@ -67,35 +71,31 @@ def intro(context):
     graphics.print_intro(context, chosen_image_fullpath)
     terminal.scroll_up(10)
 
-
     input()
 
-    return context
+    return Gamestates.NEW_GAME_OR_LOAD_SAVE
 
-def finish(context):
+def finish(gamestatehandler):
+
+    context = gamestatehandler.context
 
     #clear text
     terminal.clear()
     #zooming to normal
-    if context.current_zoom > 0:
-        terminal.zoom_out(context.current_zoom)
-    elif context.current_zoom < 0:
-        terminal.zoom_in(abs(context.current_zoom))
-
-
-    context.current_zoom = 0
+    terminal.zoom_to(context, 0)
     #first toggle back into minimized window
     if terminal.terminal_is_maximized():
         terminal.toggle_terminal_size()
 
     #do other stuff
+    return Gamestates.EXIT
 
-
-def new_game_or_save_selection(context):
+def new_game_or_save_selection(gamestatehandler):
 
     #for either selecting a new game or
     #going to the savestates
 
+    context = gamestatehandler.context
     #selection state
     selection_state = states.New_Game_Or_Save_Selection_Enum.New_Game
 
@@ -145,4 +145,4 @@ def new_game_or_save_selection(context):
             continue
 
     if selection_state == "ESCAPE":
-        return
+        return Gamestates.FINISH
