@@ -18,7 +18,7 @@ def read_settings(global_context: Global_Context):
     with open(SETTINGS_FILE, "r") as f:
         data = json.load(f)
 
-        local_context.monochrome_assets = data["monochrome_assets"]
-        local_context.full_color = data["full_color"]
+        local_context.settings.monochrome_assets = data["monochrome_assets"]
+        local_context.settings.full_color = data["full_color"]
 
     return local_context
