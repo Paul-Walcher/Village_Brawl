@@ -14,6 +14,7 @@ import re
 import pyfiglet
 import pyautogui
 import global_context
+import keyboard
 
 
 user32 = ctypes.windll.user32
@@ -147,6 +148,10 @@ def zoom_to(context, zoom):
     elif (diff < 0):
 
         zoom_out(context, abs(diff))
+
+def reset_zoom(context):
+    keyboard.press_and_release("ctrl+0")
+    context.current_zoom = 0
 
 def key_down(vk):
     user32.keybd_event(vk, 0, 0, 0)

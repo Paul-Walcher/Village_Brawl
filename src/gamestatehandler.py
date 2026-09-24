@@ -10,6 +10,7 @@ import logic
 from logic import Zoomrestore
 from global_context import Global_Context
 from states import Gamestates
+import terminal_functions as terminal
 
 
 class GamestateHandler:
@@ -27,6 +28,8 @@ class GamestateHandler:
 
         self.context = Global_Context()
         self.state = Gamestates.INTRO
+
+        terminal.reset_zoom(self.context)
 
     def run(self):
 

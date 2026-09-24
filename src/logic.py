@@ -82,7 +82,7 @@ def finish(gamestatehandler):
     #clear text
     terminal.clear()
     #zooming to normal
-    terminal.zoom_to(context, 0)
+    terminal.reset_zoom(context)
     #first toggle back into minimized window
     if terminal.terminal_is_maximized():
         terminal.toggle_terminal_size()
