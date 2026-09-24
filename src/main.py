@@ -3,6 +3,7 @@ import terminal_functions as terminal
 import colorama
 import constants
 import logic
+from logic import Zoomrestore
 import global_context
 
 
@@ -14,5 +15,8 @@ if not terminal.terminal_is_maximized():
     terminal.toggle_terminal_size()
 
 logic.intro(context)
+#now the selection of save or new game
+with Zoomrestore(context):
+    logic.new_game_or_save_selection(context)
 
 logic.finish(context)

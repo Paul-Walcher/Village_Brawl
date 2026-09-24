@@ -119,18 +119,34 @@ def press_key(vk):
     user32.keybd_event(vk, 0, KEYEVENTF_KEYUP, 0)
 
 
-def zoom_in(n):
+def zoom_in(context, n):
     for i in range(n):
         user32.keybd_event(VK_CONTROL, 0, 0, 0)
         press_key(VK_ADD)
         user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
 
+    context.current_zoom += n
 
-def zoom_out(n):
+
+def zoom_out(context, n):
     for i in range(n):
         user32.keybd_event(VK_CONTROL, 0, 0, 0)
         press_key(VK_SUBTRACT)
         user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
+
+    context.current_zoom -= n
+
+def zoom_to(context, zoom):
+
+    diff = zoom - context.current_zoom
+
+    if (diff > 0):
+
+        zoom_in(context, diff)
+
+    elif (diff < 0):
+
+        zoom_out(context, abs(diff))
 
 def key_down(vk):
     user32.keybd_event(vk, 0, 0, 0)

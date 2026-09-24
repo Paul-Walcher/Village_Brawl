@@ -34,6 +34,7 @@ class Global_Context:
     def __init__(self):
 
         self.settings = Settings()
+        self.current_zoom = 0 #positive means zoomed in, negative means zoomed out
 
     def copy(self):
 
@@ -41,6 +42,7 @@ class Global_Context:
 
         settings_copy = self.settings.copy()
         context_copy.settings = settings_copy
+        context_copy.current_zoom = self.current_zoom
 
 
         return context_copy

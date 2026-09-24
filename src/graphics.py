@@ -6,6 +6,7 @@ import random
 import terminal_functions as terminal
 import global_context
 import constants
+import states
 
 def print_intro(context, intro_image_path):
 
@@ -22,3 +23,32 @@ def print_intro(context, intro_image_path):
 
     terminal.print_centered(image)
     print("Press any Key to continue...")
+
+def print_new_game_or_save_selection(context, selection_state):
+
+
+    #for highlighting the current option
+    def print_highlighted(text):
+
+        terminal.text_rgb(0, 0, 0)
+        terminal.background_rgb(255, 255, 255)
+        print(text, end="")
+        terminal.color_reset()
+        print()
+
+    terminal.clear()
+
+    terminal.zoom_to(context, 10)
+
+    if selection_state == states.New_Game_Or_Save_Selection_Enum.New_Game:
+        print_highlighted("New Game")
+    else:
+        print("New Game")
+    if selection_state == states.New_Game_Or_Save_Selection_Enum.Load_Save:
+        print_highlighted("Load_Save")
+    else:
+        print("Load_Save")
+    if selection_state == states.New_Game_Or_Save_Selection_Enum.Go_Back:
+        print_highlighted("Go Back")
+    else:
+        print("Go Back")
