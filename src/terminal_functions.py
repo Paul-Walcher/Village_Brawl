@@ -42,6 +42,10 @@ BUFFER_TIME = 0.01
 
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
+text_rgb_string = lambda r, g, b: f"\033[38;2;{r};{g};{b}m"
+background_rgb_string = lambda r, g, b: f"\033[48;2;{r};{g};{b}m"
+color_reset_string = lambda: "\033[0m"
+
 class RECT(ctypes.Structure):
     _fields_ = [
         ("left", ctypes.c_long),
@@ -225,7 +229,9 @@ def visible_length(text):
     text = ANSI_ESCAPE.sub("", text)
     return max(0, wcswidth(text))
 
-def print_centered(text, full=False, shift=0):
+def print_centered(text, full=False, shift=0, text_color=None, background_color=None,
+                    prev_text_color=None, prev_background_color=None
+                    ):
     time.sleep(BUFFER_TIME)
     terminal_width = shutil.get_terminal_size().columns
 
@@ -241,6 +247,23 @@ def print_centered(text, full=False, shift=0):
     block_left = (terminal_width - max_width) // 2 + shift
     block_left = max(0, block_left)
 
+    leading_string = ""
+
+    if text_color:
+        leading_string += text_rgb_string(*text_color)
+    if background_color:
+        leading_string += background_rgb_string(*background_color)
+
+    reset_string = ""
+
+    if prev_text_color:
+        reset_string += text_rgb_string(*prev_text_color)
+    if prev_background_color:
+        reset_string += background_rgb_string(*prev_background_color)
+
+    if not reset_string:
+        reset_string = color_reset_string()
+
     for line in lines:
         line_width = visible_length(line)
 
@@ -249,7 +272,7 @@ def print_centered(text, full=False, shift=0):
 
         output = (
             " " * (block_left + line_offset)
-            + line
+            + leading_string + line + reset_string
         )
 
         if full:

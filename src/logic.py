@@ -69,7 +69,7 @@ def intro(gamestatehandler):
     chosen_image_fullpath = os.path.join(constants.STANDARD_IMAGE_PATH, chosen_image)
 
     graphics.print_intro(context, chosen_image_fullpath)
-    terminal.scroll_up(10)
+    terminal.scroll_up(2)
 
     time.sleep(KEY_RELEASE_BUFEER)
 
@@ -111,10 +111,12 @@ def new_game_or_save_selection(gamestatehandler):
 
     current_encoding = 0
 
-    terminal.zoom_to(context, 5)
+    terminal.zoom_in(context, 20)
 
 
     graphics.print_new_game_or_save_selection(context, selection_state)
+
+    terminal.zoom_out(context, 5)
 
     w_pressed = False
     s_pressed = False

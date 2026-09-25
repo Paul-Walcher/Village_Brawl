@@ -30,9 +30,7 @@ def print_new_game_or_save_selection(context, selection_state):
     #for highlighting the current option
     def print_highlighted(text):
 
-        terminal.text_rgb(0, 0, 0)
-        terminal.background_rgb(255, 255, 255)
-        print(text, end="")
+        terminal.print_centered(text, text_color=(255, 255, 0))
         terminal.color_reset()
         print()
 
@@ -41,14 +39,16 @@ def print_new_game_or_save_selection(context, selection_state):
 
     terminal.zoom_in(context, 5)
 
+    print("\n"*5)
+
     if selection_state == states.New_Game_Or_Save_Selection_Enum.New_Game:
         print_highlighted("New Game")
     else:
         print("New Game")
     if selection_state == states.New_Game_Or_Save_Selection_Enum.Load_Save:
-        print_highlighted("Load_Save")
+        print_highlighted("Load Save")
     else:
-        print("Load_Save")
+        print("Load Save")
     if selection_state == states.New_Game_Or_Save_Selection_Enum.Go_Back:
         print_highlighted("Go Back")
     else:
