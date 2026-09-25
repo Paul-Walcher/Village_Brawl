@@ -75,7 +75,11 @@ def intro(gamestatehandler):
 
     terminal.wait_for_key("enter")
 
-    return Gamestates.NEW_GAME_OR_LOAD_SAVE
+    #gamestates
+    #current state is intro
+    gamestatehandler.state_stack.pop()
+    #pushing new state
+    gamestatehandler.state_stack.push(Gamestates.NEW_GAME_OR_LOAD_SAVE)
 
 def finish(gamestatehandler):
 
@@ -92,8 +96,6 @@ def finish(gamestatehandler):
     terminal.reset_zoom(context)
 
     terminal.clear_keyboard_buffer()
-    #do other stuff
-    return Gamestates.EXIT
 
 def new_game_or_save_selection(gamestatehandler):
 
@@ -146,7 +148,7 @@ def new_game_or_save_selection(gamestatehandler):
 
         if not keyboard.is_pressed("s") and s_pressed:
             s_pressed = False
-            
+
         if keyboard.is_pressed("esc"):
             quit = True
             selection_state = "ESCAPE"
@@ -155,13 +157,16 @@ def new_game_or_save_selection(gamestatehandler):
         if keyboard.is_pressed("enter"):
             break
 
+    #cleaning up this state
+    gamestatehandler.state_stack.pop()
+
     if selection_state == "ESCAPE":
-        return Gamestates.FINISH
+        gamestatehandler.state_stack.push(Gamestates.FINISH)
 
     if selection_state == states.New_Game_Or_Save_Selection_Enum.Go_Back:
 
-        return Gamestates.INTRO
+        gamestatehandler.state_stack.push(Gamestates.INTRO)
 
     else:
 
-        return Gamestates.FINISH
+        gamestatehandler.state_stack.push(Gamestates.FINISH)

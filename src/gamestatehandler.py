@@ -13,6 +13,29 @@ from states import Gamestates
 import terminal_functions as terminal
 
 
+class Stack:
+
+    def __init__(self):
+
+        self.stack = []
+
+    def size(self):
+        return len(self.stack)
+
+    def top(self):
+
+        if self.size() > 0:
+            return self.stack[-1]
+        else:
+            return None
+
+    def push(self, obj):
+
+        self.stack.append(obj)
+
+    def pop(self):
+        return self.stack.pop()
+
 class GamestateHandler:
 
 
@@ -27,7 +50,8 @@ class GamestateHandler:
     def __init__(self):
 
         self.context = Global_Context()
-        self.state = Gamestates.INTRO
+        self.state_stack = Stack()
+        self.state_stack.push(Gamestates.INTRO)
 
         terminal.reset_zoom(self.context)
 
@@ -38,20 +62,27 @@ class GamestateHandler:
         """
 
         quit = False
-
+        next_state = None
         while not quit:
 
+            next_state = self.state_stack.top()
+
+            if next_state is None:
+                next_state = Gamestates.EXIT
+                break
+
+            #firing the function
             with Zoomrestore(self.context):
-                self.state = GamestateHandler.state_to_function[self.state](self)
+                GamestateHandler.state_to_function[next_state](self)
 
-            if self.state == Gamestates.FINISH:
+            if next_state == Gamestates.FINISH:
                 quit = True
-            if self.state == Gamestates.EXIT:
+            if next_state == Gamestates.EXIT:
                 quit = True
 
-        if self.state == Gamestates.FINISH:
+        if next_state == Gamestates.FINISH:
             self.finish()
-        elif self.state == Gamestates.EXIT:
+        elif next_state == Gamestates.EXIT:
             self.exit()
 
 
