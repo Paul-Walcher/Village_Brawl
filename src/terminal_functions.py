@@ -11,6 +11,7 @@ import os
 import shutil
 import re
 
+from wcwidth import wcswidth, center
 import pyfiglet
 import pyautogui
 import global_context
@@ -205,47 +206,53 @@ def scroll_page_down(n):
 
 
 def visible_length(text):
-    """Return the number of visible terminal characters."""
-    return len(ANSI_ESCAPE.sub('', text))
-
+    text = ANSI_ESCAPE.sub("", text)
+    return max(0, wcswidth(text))
 
 def print_centered(text, full=False, shift=0):
     terminal_width = shutil.get_terminal_size().columns
 
     lines = text.splitlines()
 
-    # Find the visible width of the widest line
-    max_width = max(
-        (visible_length(line) for line in lines),
-        default=0
-    )
+    if not lines:
+        return
 
-    # Center the whole block, then apply the shift
-    left_padding = max(
-        0,
-        (terminal_width - max_width) // 2 + shift
-    )
+    # Width of the widest visible line
+    max_width = max(visible_length(line) for line in lines)
+
+    # Position of the whole block
+    block_left = (terminal_width - max_width) // 2 + shift
+    block_left = max(0, block_left)
 
     for line in lines:
         line_width = visible_length(line)
 
-        # Keep all lines aligned with the widest line
-        right_padding = max_width - line_width
+        # Center this line inside the block
+        line_offset = (max_width - line_width) // 2
 
         output = (
-            " " * left_padding
+            " " * (block_left + line_offset)
             + line
-            + " " * right_padding
         )
 
-        # Fill the remainder of the terminal if requested
         if full:
             output += " " * max(
                 0,
-                terminal_width - left_padding - max_width
+                terminal_width - block_left - line_offset - line_width
             )
 
         print(output)
+
+def print_figlet(text, font, width=200, centered = True):
+    """
+    Prints text with figlet fonts
+    """
+    f = pyfiglet.Figlet(font=font, width=width)
+
+    if centered:
+        print(*[x.center(shutil.get_terminal_size().columns) for x in f.renderText(text).split("\n")],sep="\n")
+    else:
+        print(f.renderText(text))
 
 def text_rgb(r, g, b):
     """Set the text color to RGB."""
@@ -276,11 +283,3 @@ def show_cursor(context):
 """
 ascii fonts
 """
-
-def ansi_shadow(text, width=200):
-    shadow_text = pyfiglet.figlet_format(
-        text,
-        font="ansi_shadow",
-        width=width
-    )
-    return shadow_text

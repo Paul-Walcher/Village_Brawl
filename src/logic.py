@@ -62,10 +62,7 @@ def intro(gamestatehandler):
 
     gamestatehandler.context = context
 
-    files = list(os.listdir(constants.STANDARD_IMAGE_PATH))
-    files = [file for file in files if file.endswith(".png") or file.endswith(".jpg")  or file.endswith(".jpeg")]
-
-    chosen_image = random.choice(files)
+    chosen_image = random.choice(constants.INTRO_IMAGES)
     chosen_image_fullpath = os.path.join(constants.STANDARD_IMAGE_PATH, chosen_image)
 
     graphics.print_intro(context, chosen_image_fullpath)
@@ -81,11 +78,14 @@ def finish(gamestatehandler):
 
     #clear text
     terminal.clear()
-    #zooming to normal
-    terminal.reset_zoom(context)
+
     #first toggle back into minimized window
     if terminal.terminal_is_maximized():
         terminal.toggle_terminal_size()
+
+
+    terminal.reset_zoom(context)
+
 
     #do other stuff
     return Gamestates.EXIT

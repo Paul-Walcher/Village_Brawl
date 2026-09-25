@@ -37,16 +37,23 @@ class GamestateHandler:
         Calls the appropriate functions
         """
 
-        while 1:
+        quit = False
+
+        while not quit:
 
             with Zoomrestore(self.context):
                 self.state = GamestateHandler.state_to_function[self.state](self)
-                if self.state == Gamestates.FINISH:
-                    self.finish()
-                    break
-                if self.state == Gamestates.EXIT:
-                    self.exit()
-                    break
+
+            if self.state == Gamestates.FINISH:
+                quit = True
+            if self.state == Gamestates.EXIT:
+                quit = True
+
+        if self.state == Gamestates.FINISH:
+            self.finish()
+        elif self.state == Gamestates.EXIT:
+            self.exit()
+
 
     def finish(self):
         #ending activity

@@ -11,10 +11,11 @@ import states
 
 def print_intro(context, intro_image_path):
 
+    terminal.zoom_out(context,0)
+
     print("\n"*2)
     terminal.text_rgb(255, 0, 0)
-    headline = terminal.ansi_shadow("Village Brawl")
-    terminal.print_centered(headline)
+    terminal.print_figlet("Village Brawl", "ansi_shadow")
     terminal.color_reset()
 
     #image printing
@@ -26,7 +27,6 @@ def print_intro(context, intro_image_path):
     print("Press any Key to continue...")
 
 def print_new_game_or_save_selection(context, selection_state):
-
 
     #for highlighting the current option
     def print_highlighted(text):
