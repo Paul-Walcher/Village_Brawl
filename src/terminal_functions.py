@@ -39,6 +39,7 @@ VK_NEXT = 0x22       # Page Down
 VK_L = 0x4C
 
 BUFFER_TIME = 0.01
+FIRST_PRINTED_LINE = None
 
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
@@ -52,6 +53,31 @@ class RECT(ctypes.Structure):
         ("top", ctypes.c_long),
         ("right", ctypes.c_long),
         ("bottom", ctypes.c_long),
+    ]
+
+class COORD(ctypes.Structure):
+    _fields_ = [
+        ("X", ctypes.c_short),
+        ("Y", ctypes.c_short),
+    ]
+
+
+class SMALL_RECT(ctypes.Structure):
+    _fields_ = [
+        ("Left", ctypes.c_short),
+        ("Top", ctypes.c_short),
+        ("Right", ctypes.c_short),
+        ("Bottom", ctypes.c_short),
+    ]
+
+
+class CONSOLE_SCREEN_BUFFER_INFO(ctypes.Structure):
+    _fields_ = [
+        ("dwSize", COORD),
+        ("dwCursorPosition", COORD),
+        ("wAttributes", ctypes.c_ushort),
+        ("srWindow", SMALL_RECT),
+        ("dwMaximumWindowSize", COORD),
     ]
 
 
@@ -101,6 +127,8 @@ def image_to_ascii(path, columns, width_ratio=2.2, full_color=False, monochrome=
     if monochrome:
         text = ANSI_ESCAPE.sub('', text)
     return text
+
+
 
 def image_to_ascii_from_context(path, columns, context):
     return image_to_ascii(path, columns,
@@ -187,6 +215,7 @@ def press(vk):
     key_up(vk)
 
 
+
 def scroll_up(n):
     for i in range(n):
         key_down(VK_CONTROL)
@@ -223,7 +252,10 @@ def scroll_page_down(n):
         key_up(VK_CONTROL)
 
 
+def reset_scroll():
 
+    scroll = get_scroll_position()
+    scroll_up(scroll)
 
 def visible_length(text):
     text = ANSI_ESCAPE.sub("", text)

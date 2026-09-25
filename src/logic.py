@@ -146,6 +146,7 @@ def new_game_or_save_selection(gamestatehandler):
 
         if not keyboard.is_pressed("s") and s_pressed:
             s_pressed = False
+            
         if keyboard.is_pressed("esc"):
             quit = True
             selection_state = "ESCAPE"
