@@ -6,12 +6,12 @@ The main class for handling gamestates
 from enum import Enum, auto
 
 import sys
+import time
 import logic
 from logic import Zoomrestore
 from global_context import Global_Context
 from states import Gamestates
 import terminal_functions as terminal
-
 
 class Stack:
 
@@ -72,8 +72,8 @@ class GamestateHandler:
                 break
 
             #firing the function
-            with Zoomrestore(self.context):
-                GamestateHandler.state_to_function[next_state](self)
+
+            GamestateHandler.state_to_function[next_state](self)
 
             if next_state == Gamestates.FINISH:
                 quit = True

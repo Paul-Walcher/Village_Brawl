@@ -59,6 +59,7 @@ def intro(gamestatehandler):
     context = gamestatehandler.context
 
     terminal.clear()
+    terminal.reset_zoom(context)
 
     #reading settings
     context = settings_reader.read_settings(context)
@@ -102,6 +103,7 @@ def new_game_or_save_selection(gamestatehandler):
     #for either selecting a new game or
     #going to the savestates
 
+
     context = gamestatehandler.context
     #selection state
     selection_state = states.New_Game_Or_Save_Selection_Enum.New_Game
@@ -113,17 +115,27 @@ def new_game_or_save_selection(gamestatehandler):
 
     current_encoding = 0
 
-    terminal.zoom_in(context, 20)
+    focus_zoom = 0
+    defocus_zoom = 0
 
+    terminal.zoom_to(context, 20)
 
     graphics.print_new_game_or_save_selection(context, selection_state)
 
-    terminal.zoom_out(context, 5)
-
     w_pressed = False
     s_pressed = False
+    enter_pressed = False
 
     quit = False
+    handle = None
+
+    if "RUNNING" not in context.misc:
+        context.misc["RUNNING"] = False
+    if "HANDLE" not in context.misc:
+        context.misc["HANDLE"] = None
+
+    gamestatehandler.state_stack.pop()
+
 
     while not quit:
 
@@ -132,8 +144,9 @@ def new_game_or_save_selection(gamestatehandler):
             current_encoding -= 1
             current_encoding %= 3
             selection_state = num_encoding[current_encoding]
-            with Zoomrestore(context):
-                graphics.print_new_game_or_save_selection(context, selection_state)
+
+            graphics.print_new_game_or_save_selection(context, selection_state)
+
 
         if not keyboard.is_pressed("w") and w_pressed:
             w_pressed = False
@@ -143,8 +156,8 @@ def new_game_or_save_selection(gamestatehandler):
             current_encoding += 1
             current_encoding %= 3
             selection_state = num_encoding[current_encoding]
-            with Zoomrestore(context):
-                graphics.print_new_game_or_save_selection(context, selection_state)
+            graphics.print_new_game_or_save_selection(context, selection_state)
+
 
         if not keyboard.is_pressed("s") and s_pressed:
             s_pressed = False
@@ -154,19 +167,37 @@ def new_game_or_save_selection(gamestatehandler):
             selection_state = "ESCAPE"
             continue
 
-        if keyboard.is_pressed("enter"):
-            break
+        if keyboard.is_pressed("enter") and not enter_pressed:
 
-    #cleaning up this state
-    gamestatehandler.state_stack.pop()
+            if selection_state == "ESCAPE":
+                gamestatehandler.state_stack.push(Gamestates.FINISH)
+                quit = True
 
-    if selection_state == "ESCAPE":
-        gamestatehandler.state_stack.push(Gamestates.FINISH)
+            elif selection_state == states.New_Game_Or_Save_Selection_Enum.Go_Back:
 
-    if selection_state == states.New_Game_Or_Save_Selection_Enum.Go_Back:
+                gamestatehandler.state_stack.push(Gamestates.INTRO)
+                quit = True
 
-        gamestatehandler.state_stack.push(Gamestates.INTRO)
+            else:
 
-    else:
+                if not context.misc["RUNNING"]:
+                    args = [os.path.join(constants.STANDARD_IMAGE_PATH, "Wood.png"), str(context.settings.mid_res),
+                            str(int(context.settings.full_color)), str(int(context.settings.monochrome_assets))]
+                    context.misc["HANDLE"] = terminal.split_horizontally(context, "split_terminal_files/draw_image.py", args)
+                    context.misc["RUNNING"] = True
 
-        gamestatehandler.state_stack.push(Gamestates.FINISH)
+                    time.sleep(0.3)
+
+                    terminal.focus_prev(context)
+                    graphics.print_new_game_or_save_selection(context, selection_state)
+
+                else:
+                    terminal.close(context, context.misc["HANDLE"])
+                    time.sleep(0.1)
+                    terminal.focus_prev(context)
+                    context.misc["RUNNING"] = False
+
+            enter_pressed = True
+
+        if not keyboard.is_pressed("enter") and enter_pressed:
+            enter_pressed = False

@@ -8,6 +8,7 @@ import terminal_functions as terminal
 import global_context
 import constants
 import states
+import time
 
 def print_intro(context, intro_image_path):
 
@@ -36,8 +37,6 @@ def print_new_game_or_save_selection(context, selection_state):
 
     terminal.clear()
     terminal.hide_cursor(context)
-
-    terminal.zoom_in(context, 5)
 
     print("\n"*5)
 

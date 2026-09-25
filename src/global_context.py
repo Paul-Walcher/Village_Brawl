@@ -37,6 +37,8 @@ class Global_Context:
         self.current_zoom = 0 #positive means zoomed in, negative means zoomed out
         self.current_scroll = 0
         self.cursor_visible = True
+        self.terminal_handles = {} #handels for terminals
+        self.misc = {} # Miscellaneous
 
     def copy(self):
 
@@ -47,5 +49,7 @@ class Global_Context:
         context_copy.current_zoom = self.current_zoom
         context_copy.current_scroll = self.current_scroll
         context_copy.cursor_visible = self.cursor_visible
+        context_copy.terminal_handles = self.terminal_handles #intentional reference copy
+        context_copy.misc = self.misc
 
         return context_copy

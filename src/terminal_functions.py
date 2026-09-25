@@ -11,12 +11,15 @@ import os
 import shutil
 import re
 import time
+import subprocess
+
 
 from wcwidth import wcswidth, center
 import pyfiglet
 import pyautogui
 import global_context
 import keyboard
+import constants
 
 
 user32 = ctypes.windll.user32
@@ -40,6 +43,8 @@ VK_L = 0x4C
 
 BUFFER_TIME = 0.01
 FIRST_PRINTED_LINE = None
+
+TERMINAL_ID = 1
 
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
@@ -80,6 +85,10 @@ class CONSOLE_SCREEN_BUFFER_INFO(ctypes.Structure):
         ("dwMaximumWindowSize", COORD),
     ]
 
+class ExitSignal:
+
+    def __init__(self):
+        exit = False
 
 def wait_for_key(key):
     #waiting function
@@ -91,12 +100,17 @@ def clear_keyboard_buffer():
     handle = kernel32.GetStdHandle(-10)  # STD_INPUT_HANDLE
     kernel32.FlushConsoleInputBuffer(handle)
 
-def split_horizontally(script, args=None):
+def split_horizontally(context, script, args=None):
     """
     Will be executed from this folders parentfolder
     """
+    global TERMINAL_ID
+
     if args is None:
         args = []
+    stop_script_file = str(TERMINAL_ID) + ".txt"
+    stop_script = os.path.join("terminal_subfiles", stop_script_file)
+
     subprocess.Popen([
         "wt",
         "-w", "0",
@@ -105,8 +119,41 @@ def split_horizontally(script, args=None):
         "-d", constants.SCRIPT_DIR(),
         "python",
         script,
+        stop_script,
         *args
     ])
+
+    context.terminal_handles[TERMINAL_ID] = stop_script
+    handle = TERMINAL_ID
+    TERMINAL_ID += 1
+
+    return handle
+
+def close(context, handle):
+
+    stop_script = context.terminal_handles[handle]
+
+    with open(stop_script, "w"):
+        pass
+
+    del context.terminal_handles[handle]
+
+def focus_prev(context):
+    subprocess.run([
+        "wt",
+        "-w", "0",
+        "move-focus",
+        "previousInOrder"
+        ])
+
+def focus_next(context):
+    subprocess.run([
+        "wt",
+        "-w", "0",
+        "move-focus",
+        "nextInOrder"
+    ])
+
 
 
 def image_to_ascii(path, columns, width_ratio=2.2, full_color=False, monochrome=False):
@@ -183,41 +230,70 @@ def press_key(vk):
     user32.keybd_event(vk, 0, 0, 0)
     user32.keybd_event(vk, 0, KEYEVENTF_KEYUP, 0)
 
-
-def zoom_in(context, n):
+def zoom_in_no_context(n, buffer_time=BUFFER_TIME):
     for i in range(n):
         user32.keybd_event(VK_CONTROL, 0, 0, 0)
         press_key(VK_ADD)
         user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
-        time.sleep(BUFFER_TIME)
+        time.sleep(buffer_time)
 
-    context.current_zoom += n
-
-
-def zoom_out(context, n):
+def zoom_out_no_context(n, buffer_time=BUFFER_TIME):
     for i in range(n):
         user32.keybd_event(VK_CONTROL, 0, 0, 0)
         press_key(VK_SUBTRACT)
         user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
-        time.sleep(BUFFER_TIME)
+        time.sleep(buffer_time)
+
+def reset_zoom_no_context():
+    keyboard.press_and_release("ctrl+0")
+    context.current_zoom = 0
+    time.sleep(0.1)
+
+
+
+def zoom_in(context, n, buffer_time=BUFFER_TIME):
+    for i in range(n):
+        user32.keybd_event(VK_CONTROL, 0, 0, 0)
+        press_key(VK_ADD)
+        user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
+        time.sleep(buffer_time)
+
+    context.current_zoom += n
+
+def zoom_to_no_context(prev_zoom, zoom, buffer_t=0.01):
+
+    diff = zoom - prev_zoom
+
+    if (diff > 0):
+        zoom_in_no_context(diff, buffer_time=buffer_t)
+    if (diff < 0):
+        zoom_out_no_context(abs(diff), buffer_time=buffer_t)
+
+
+def zoom_out(context, n, buffer_time=BUFFER_TIME):
+    for i in range(n):
+        user32.keybd_event(VK_CONTROL, 0, 0, 0)
+        press_key(VK_SUBTRACT)
+        user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
+        time.sleep(buffer_time)
 
     context.current_zoom -= n
 
-def zoom_to(context, zoom):
-
-    diff = zoom - context.current_zoom
-
-    if (diff > 0):
-
-        zoom_in(context, diff)
-
-    elif (diff < 0):
-
-        zoom_out(context, abs(diff))
 
 def reset_zoom(context):
     keyboard.press_and_release("ctrl+0")
     context.current_zoom = 0
+    time.sleep(0.1)
+
+def zoom_to(context, zoom, buffer_t=0.01):
+
+    diff = zoom - context.current_zoom
+
+    if (diff > 0):
+        zoom_in(context, diff, buffer_time=buffer_t)
+    if (diff < 0):
+        zoom_out(context, abs(diff), buffer_time=buffer_t)
+
 
 def key_down(vk):
     user32.keybd_event(vk, 0, 0, 0)
