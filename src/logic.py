@@ -5,6 +5,7 @@ logic.
 import os
 import sys
 import random
+import time
 
 import constants
 import global_context
@@ -15,6 +16,8 @@ import keyboard
 import states
 from states import Gamestates
 
+
+KEY_RELEASE_BUFEER = 0.5
 
 class Zoomrestore:
 
@@ -67,6 +70,8 @@ def intro(gamestatehandler):
 
     graphics.print_intro(context, chosen_image_fullpath)
     terminal.scroll_up(10)
+
+    time.sleep(KEY_RELEASE_BUFEER)
 
     input()
 
@@ -144,5 +149,16 @@ def new_game_or_save_selection(gamestatehandler):
             selection_state = "ESCAPE"
             continue
 
+        if keyboard.is_pressed("enter"):
+            break
+
     if selection_state == "ESCAPE":
+        return Gamestates.FINISH
+
+    if selection_state == states.New_Game_Or_Save_Selection_Enum.Go_Back:
+
+        return Gamestates.INTRO
+
+    else:
+
         return Gamestates.FINISH

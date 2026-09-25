@@ -11,7 +11,6 @@ import states
 
 def print_intro(context, intro_image_path):
 
-    terminal.zoom_out(context,0)
 
     print("\n"*2)
     terminal.text_rgb(255, 0, 0)

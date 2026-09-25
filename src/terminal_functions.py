@@ -10,6 +10,7 @@ import time
 import os
 import shutil
 import re
+import time
 
 from wcwidth import wcswidth, center
 import pyfiglet
@@ -34,6 +35,8 @@ VK_NEXT = 0x22       # Page Down
 
 VK_L = 0x4C
 
+BUFFER_TIME = 0.01
+
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
 class RECT(ctypes.Structure):
@@ -43,7 +46,6 @@ class RECT(ctypes.Structure):
         ("right", ctypes.c_long),
         ("bottom", ctypes.c_long),
     ]
-
 
 
 
@@ -126,6 +128,7 @@ def zoom_in(context, n):
         user32.keybd_event(VK_CONTROL, 0, 0, 0)
         press_key(VK_ADD)
         user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
+        time.sleep(BUFFER_TIME)
 
     context.current_zoom += n
 
@@ -135,6 +138,7 @@ def zoom_out(context, n):
         user32.keybd_event(VK_CONTROL, 0, 0, 0)
         press_key(VK_SUBTRACT)
         user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
+        time.sleep(BUFFER_TIME)
 
     context.current_zoom -= n
 
@@ -210,6 +214,7 @@ def visible_length(text):
     return max(0, wcswidth(text))
 
 def print_centered(text, full=False, shift=0):
+    time.sleep(BUFFER_TIME)
     terminal_width = shutil.get_terminal_size().columns
 
     lines = text.splitlines()
@@ -249,6 +254,7 @@ def print_figlet(text, font, width=200, centered = True):
     """
     f = pyfiglet.Figlet(font=font, width=width)
 
+    time.sleep(BUFFER_TIME)
     if centered:
         print(*[x.center(shutil.get_terminal_size().columns) for x in f.renderText(text).split("\n")],sep="\n")
     else:
