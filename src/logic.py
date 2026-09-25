@@ -73,7 +73,7 @@ def intro(gamestatehandler):
 
     time.sleep(KEY_RELEASE_BUFEER)
 
-    input()
+    terminal.wait_for_key("enter")
 
     return Gamestates.NEW_GAME_OR_LOAD_SAVE
 
@@ -91,7 +91,7 @@ def finish(gamestatehandler):
 
     terminal.reset_zoom(context)
 
-
+    terminal.clear_keyboard_buffer()
     #do other stuff
     return Gamestates.EXIT
 

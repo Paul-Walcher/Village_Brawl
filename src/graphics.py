@@ -23,7 +23,7 @@ def print_intro(context, intro_image_path):
     image = terminal.image_to_ascii_from_context(intro_image_path, resolution, context)
 
     terminal.print_centered(image)
-    print("Press any Key to continue...")
+    print("Press enter to continue...")
 
 def print_new_game_or_save_selection(context, selection_state):
 

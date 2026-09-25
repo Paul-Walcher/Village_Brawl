@@ -20,6 +20,9 @@ import keyboard
 
 
 user32 = ctypes.windll.user32
+kernel32 = ctypes.windll.kernel32
+
+
 
 VK_CONTROL = 0x11
 VK_ADD = 0x6B
@@ -48,6 +51,15 @@ class RECT(ctypes.Structure):
     ]
 
 
+def wait_for_key(key):
+    #waiting function
+    while 1:
+        if keyboard.is_pressed(key):
+            break
+
+def clear_keyboard_buffer():
+    handle = kernel32.GetStdHandle(-10)  # STD_INPUT_HANDLE
+    kernel32.FlushConsoleInputBuffer(handle)
 
 
 def image_to_ascii(path, columns, width_ratio=2.2, full_color=False, monochrome=False):
