@@ -91,6 +91,23 @@ def clear_keyboard_buffer():
     handle = kernel32.GetStdHandle(-10)  # STD_INPUT_HANDLE
     kernel32.FlushConsoleInputBuffer(handle)
 
+def split_horizontally(script, args=None):
+    """
+    Will be executed from this folders parentfolder
+    """
+    if args is None:
+        args = []
+    subprocess.Popen([
+        "wt",
+        "-w", "0",
+        "split-pane",
+        "-V",
+        "-d", constants.SCRIPT_DIR(),
+        "python",
+        script,
+        *args
+    ])
+
 
 def image_to_ascii(path, columns, width_ratio=2.2, full_color=False, monochrome=False):
     art = ascii_magic.from_image(path)
