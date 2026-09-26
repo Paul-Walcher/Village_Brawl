@@ -222,36 +222,69 @@ def new_game(gamestatehandler):
 
     class LocalObject:
 
-        def __init__(self, ctxt):
+        def __init__(self, ctxt, gsh):
             self.quit = False
+            self.gamestatehandler = gsh
             self.context = ctxt
             self.selection_state =  0
             self.save_name = ""
 
     def esc_pressed(key, local_object):
         local_object.quit = True
+        local_object.gamestatehandler.state_stack.push(states.Gamestates.FINISH)
 
     def key_pressed(key, local_object):
 
+        if keyboard.is_pressed("left") or keyboard.is_pressed("right"):
+            return
+
         if key in constants.VALID_SYMBOLS:
             local_object.save_name += key
+            local_object.selection_state = 0
             graphics.print_new_game(local_object.context, local_object.save_name, local_object.selection_state)
 
+    def delete_last_character(key, local_object):
 
-    local_object = LocalObject(context)
+        if local_object.save_name:
+            local_object.save_name = local_object.save_name[:-1]
+            graphics.print_new_game(local_object.context, local_object.save_name, local_object.selection_state)
+
+    def left_pressed(key, local_object):
+
+        local_object.selection_state += 1
+        local_object.selection_state %= 3
+        graphics.print_new_game(local_object.context, local_object.save_name, local_object.selection_state)
+
+    def right_pressed(key, local_object):
+
+        local_object.selection_state -= 1
+        local_object.selection_state %= 3
+        graphics.print_new_game(local_object.context, local_object.save_name, local_object.selection_state)
+
+    def enter_pressed(key, local_object):
+
+        #back
+        if local_object.selection_state == 1:
+            local_object.quit = True
+            local_object.gamestatehandler.state_stack.push(states.Gamestates.NEW_GAME_OR_LOAD_SAVE)
+
+
+    local_object = LocalObject(context, gamestatehandler)
 
     keycallback = terminal.KeyCallback()
     keycallback.register_key("esc", esc_pressed)
+    keycallback.register_key("backspace", delete_last_character)
+    keycallback.register_key("left", left_pressed)
+    keycallback.register_key("right", right_pressed)
+    keycallback.register_key("enter", enter_pressed)
     for symbol in constants.VALID_SYMBOLS:
         keycallback.register_key(symbol, key_pressed)
 
     #zooming
-    terminal.zoom_to(context, 20)
+    terminal.zoom_to(context, 25)
     #printing
     graphics.print_new_game(context, local_object.save_name, local_object.selection_state)
 
     while not local_object.quit:
 
         keycallback.check_presses(local_object)
-
-    gamestatehandler.state_stack.push(states.Gamestates.FINISH)

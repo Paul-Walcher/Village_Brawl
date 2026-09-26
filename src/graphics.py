@@ -12,6 +12,37 @@ import time
 import io
 import sys
 
+class NewPage:
+
+
+    def __init__(self):
+        self.old_stdout = None
+        self.buffer = io.StringIO()
+
+    def redraw(self):
+        sys.stdout.write(
+            "\x1b[2J\x1b[H"  # clear screen + move cursor home
+            + self.buffer.getvalue()
+        )
+        sys.stdout.flush()
+
+    def __enter__(self):
+
+        self.old_stdout = sys.stdout
+        sys.stdout = self.buffer
+
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+
+        sys.stdout = self.old_stdout
+        self.redraw()
+
+        return False
+
+
+
+
 def print_intro(context, intro_image_path):
 
 
@@ -68,11 +99,9 @@ def print_new_game(context, savefile_name, selection_state):
         terminal.color_reset()
         print()
 
-    try:
-        sys.stdout = buffer
+    with NewPage():
 
-
-        print("Choose a name for your savefile:")
+        terminal.print_centered("Choose a name for your savefile:")
         print("\n"*3)
 
         #selection states:
@@ -86,7 +115,11 @@ def print_new_game(context, savefile_name, selection_state):
         else:
             terminal.print_centered(savefile_name)
 
-        print("\n"*5)
+        if not savefile_name:
+
+            print()
+
+        print("\n"*8)
 
         if selection_state == 1:
             terminal.text_rgb(*HIGHLIGHT_COLOR)
@@ -96,7 +129,7 @@ def print_new_game(context, savefile_name, selection_state):
         else:
             print("Back", end="")
 
-        dist = 10
+        dist = 49
 
         if selection_state == 2:
 
@@ -109,9 +142,3 @@ def print_new_game(context, savefile_name, selection_state):
 
             print(" "*dist, end="")
             print("Start Game")
-
-    finally:
-
-        sys.stdout = old_stdout
-
-    terminal.redraw(buffer.getvalue())

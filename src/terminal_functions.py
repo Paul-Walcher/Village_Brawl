@@ -119,7 +119,7 @@ class KeyCallback:
                 self.keys_callback[key][0] = True
                 self.keys_callback[key][1](key, args)
 
-            if not keyboard.is_pressed(key) and self.keys_callback[key][0]:
+            elif not keyboard.is_pressed(key) and self.keys_callback[key][0]:
                 self.keys_callback[key][0] = False
 
 
