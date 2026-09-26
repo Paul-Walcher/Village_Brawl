@@ -9,6 +9,8 @@ import global_context
 import constants
 import states
 import time
+import io
+import sys
 
 def print_intro(context, intro_image_path):
 
@@ -52,3 +54,64 @@ def print_new_game_or_save_selection(context, selection_state):
         print_highlighted("Go Back")
     else:
         print("Go Back")
+
+def print_new_game(context, savefile_name, selection_state):
+
+    old_stdout = sys.stdout
+    buffer = io.StringIO()
+
+    HIGHLIGHT_COLOR = (255, 255, 0)
+    #for highlighting the current option
+    def print_highlighted(text):
+
+        terminal.print_centered(text, text_color=HIGHLIGHT_COLOR)
+        terminal.color_reset()
+        print()
+
+    try:
+        sys.stdout = buffer
+
+
+        print("Choose a name for your savefile:")
+        print("\n"*3)
+
+        #selection states:
+        #0: savefile_name
+        #1: back
+        #2: start
+
+        if selection_state == 0:
+            print_highlighted(savefile_name)
+
+        else:
+            terminal.print_centered(savefile_name)
+
+        print("\n"*5)
+
+        if selection_state == 1:
+            terminal.text_rgb(*HIGHLIGHT_COLOR)
+            print("Back", end="")
+            terminal.color_reset()
+
+        else:
+            print("Back", end="")
+
+        dist = 10
+
+        if selection_state == 2:
+
+            print(" "*dist, end="")
+            terminal.text_rgb(*HIGHLIGHT_COLOR)
+            print("Start Game")
+            terminal.color_reset()
+
+        else:
+
+            print(" "*dist, end="")
+            print("Start Game")
+
+    finally:
+
+        sys.stdout = old_stdout
+
+    terminal.redraw(buffer.getvalue())

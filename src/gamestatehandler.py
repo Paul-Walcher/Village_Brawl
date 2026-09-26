@@ -42,6 +42,8 @@ class GamestateHandler:
     state_to_function = {
                             Gamestates.INTRO: logic.intro,
                             Gamestates.NEW_GAME_OR_LOAD_SAVE: logic.new_game_or_save_selection,
+                            Gamestates.NEW_GAME: logic.new_game,
+
                             Gamestates.FINISH: lambda x: Gamestates.FINISH,
                             Gamestates.EXIT: lambda x: Gamestates.EXIT
                         }

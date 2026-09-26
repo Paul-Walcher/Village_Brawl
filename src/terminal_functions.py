@@ -12,6 +12,7 @@ import shutil
 import re
 import time
 import subprocess
+import sys
 
 
 from wcwidth import wcswidth, center
@@ -89,6 +90,38 @@ class ExitSignal:
 
     def __init__(self):
         exit = False
+
+class KeyCallback:
+
+    def __init__(self):
+
+        #entries of form: key: [is_pressed, callback_function]
+        self.keys_callback = {}
+
+    def register_key(self, key, callback):
+
+        self.keys_callback[key] = [False, callback]
+
+    def unregister_key(self, key):
+
+        if key in self.keys_callback:
+            del self.keys_callback[key]
+
+    def change_callback(self, key, callback):
+
+        if key in self.keys_callback:
+            self.keys_callback[key][1] = callback
+
+    def check_presses(self, args):
+
+        for key in self.keys_callback:
+            if keyboard.is_pressed(key) and not self.keys_callback[key][0]:
+                self.keys_callback[key][0] = True
+                self.keys_callback[key][1](key, args)
+
+            if not keyboard.is_pressed(key) and self.keys_callback[key][0]:
+                self.keys_callback[key][0] = False
+
 
 def wait_for_key(key):
     #waiting function
@@ -353,6 +386,14 @@ def reset_scroll():
 def visible_length(text):
     text = ANSI_ESCAPE.sub("", text)
     return max(0, wcswidth(text))
+
+
+def redraw(text):
+    sys.stdout.write(
+        "\x1b[2J\x1b[H"  # clear screen + move cursor home
+        + text
+    )
+    sys.stdout.flush()
 
 def print_centered(text, full=False, shift=0, text_color=None, background_color=None,
                     prev_text_color=None, prev_background_color=None

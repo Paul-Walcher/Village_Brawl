@@ -86,6 +86,11 @@ def finish(gamestatehandler):
 
     context = gamestatehandler.context
 
+    #cleaning up all open terminals
+    for handle in context.terminal_handles:
+        terminal.close(context, handle)
+        time.sleep(0.1)
+
     #clear text
     terminal.clear()
 
@@ -178,6 +183,11 @@ def new_game_or_save_selection(gamestatehandler):
                 gamestatehandler.state_stack.push(Gamestates.INTRO)
                 quit = True
 
+            elif selection_state == states.New_Game_Or_Save_Selection_Enum.New_Game:
+
+                gamestatehandler.state_stack.push(Gamestates.NEW_GAME)
+                quit = True
+
             else:
 
                 if not context.misc["RUNNING"]:
@@ -201,3 +211,47 @@ def new_game_or_save_selection(gamestatehandler):
 
         if not keyboard.is_pressed("enter") and enter_pressed:
             enter_pressed = False
+
+
+
+def new_game(gamestatehandler):
+
+    gamestatehandler.state_stack.pop()
+
+    context = gamestatehandler.context
+
+    class LocalObject:
+
+        def __init__(self, ctxt):
+            self.quit = False
+            self.context = ctxt
+            self.selection_state =  0
+            self.save_name = ""
+
+    def esc_pressed(key, local_object):
+        local_object.quit = True
+
+    def key_pressed(key, local_object):
+
+        if key in constants.VALID_SYMBOLS:
+            local_object.save_name += key
+            graphics.print_new_game(local_object.context, local_object.save_name, local_object.selection_state)
+
+
+    local_object = LocalObject(context)
+
+    keycallback = terminal.KeyCallback()
+    keycallback.register_key("esc", esc_pressed)
+    for symbol in constants.VALID_SYMBOLS:
+        keycallback.register_key(symbol, key_pressed)
+
+    #zooming
+    terminal.zoom_to(context, 20)
+    #printing
+    graphics.print_new_game(context, local_object.save_name, local_object.selection_state)
+
+    while not local_object.quit:
+
+        keycallback.check_presses(local_object)
+
+    gamestatehandler.state_stack.push(states.Gamestates.FINISH)
