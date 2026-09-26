@@ -1,6 +1,7 @@
 import terminal_functions as terminal
+import import_test_folder.test2 as test2
 
 
 def hi():
 
-    terminal.print_centered("HI")
+    test2.hi()

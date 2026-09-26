@@ -1,2 +1,6 @@
 
-from . import test as test
+__all__ = [
+            "test.py",
+            "test2.py"
+
+            ]

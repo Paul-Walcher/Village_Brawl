@@ -15,6 +15,11 @@ if __name__ == "__main__":
     filename = "test.py"
     module = importlib.import_module(f"import_test_folder.test")
     globals()[filename[:-3]] = module
+    module = importlib.import_module(f"import_test_folder.test2")
+    globals()[filename[:-3]] = module
 
 
     test.hi()
+
+    for name, module in sys.modules.items():
+        print(name)
