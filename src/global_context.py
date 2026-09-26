@@ -29,13 +29,40 @@ class Settings:
 
         return settings_copy
 
+
+"""
+Contains all playinfo
+"""
+
+class Gameinfo:
+
+    def __init__(self):
+
+        self.savefile_name = None
+
+    def copy(self):
+
+        gameinfo_copy = Gameinfo()
+        gameinfo_copy.savefile_name = self.savefile_name
+
+        return gameinfo_copy
+
+    def load_from(self, other_gameinfo):
+
+        #savefile name
+        self.savefile_name = other_gameinfo.savefile_name
+
+
 class Global_Context:
 
     def __init__(self):
 
         self.settings = Settings()
+        self.gameinfo = Gameinfo()
+
         self.current_zoom = 0 #positive means zoomed in, negative means zoomed out
         self.current_scroll = 0
+        self.max_scroll = 0
         self.cursor_visible = True
         self.terminal_handles = {} #handels for terminals
         self.misc = {} # Miscellaneous
@@ -44,8 +71,12 @@ class Global_Context:
 
         context_copy = Global_Context()
 
+
         settings_copy = self.settings.copy()
+        gameinfo_copy = self.gameinfo.copy()
+
         context_copy.settings = settings_copy
+        context_copy.gameinfo = gameinfo_copy
         context_copy.current_zoom = self.current_zoom
         context_copy.current_scroll = self.current_scroll
         context_copy.cursor_visible = self.cursor_visible

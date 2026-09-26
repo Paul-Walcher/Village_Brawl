@@ -142,3 +142,37 @@ def print_new_game(context, savefile_name, selection_state):
 
             print(" "*dist, end="")
             print("Start Game")
+
+def print_select_playset(local_object):
+
+    HIGHLIGHT_COLOR = (255, 255, 0)
+    #for highlighting the current option
+    def print_highlighted(text):
+
+        terminal.print_centered(text, text_color=HIGHLIGHT_COLOR)
+        terminal.color_reset()
+
+    objects_shown = local_object.objects_shown
+    playsets = local_object.found_playsets
+    selection_state = local_object.selection_state
+
+    with NewPage():
+
+        print("\n"*3)
+        terminal.print_centered("Select your Playset", text_color=(43,220,221))
+        print("\n"*4)
+
+        if (selection_state == 1):
+            print_highlighted(playsets[local_object.scroll])
+        else:
+            terminal.print_centered(playsets[local_object.scroll])
+        for i in range(min(objects_shown, len(playsets) - local_object.scroll)):
+            terminal.print_centered(playsets[local_object.scroll + i + 1])
+
+        print("\n"*3)
+        if (selection_state == 0):
+            terminal.text_rgb(255, 255, 0)
+            print("Back")
+            terminal.color_reset()
+        else:
+            print("Back")

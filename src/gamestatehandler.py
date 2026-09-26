@@ -36,6 +36,7 @@ class Stack:
     def pop(self):
         return self.stack.pop()
 
+
 class GamestateHandler:
 
 
@@ -43,6 +44,7 @@ class GamestateHandler:
                             Gamestates.INTRO: logic.intro,
                             Gamestates.NEW_GAME_OR_LOAD_SAVE: logic.new_game_or_save_selection,
                             Gamestates.NEW_GAME: logic.new_game,
+                            Gamestates.SELECT_PLAYSET: logic.select_playset,
 
                             Gamestates.FINISH: lambda x: Gamestates.FINISH,
                             Gamestates.EXIT: lambda x: Gamestates.EXIT

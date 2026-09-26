@@ -86,6 +86,8 @@ def finish(gamestatehandler):
 
     context = gamestatehandler.context
 
+    terminal.enable_scrollback()
+
     #cleaning up all open terminals
     for handle in context.terminal_handles:
         terminal.close(context, handle)
@@ -229,6 +231,7 @@ def new_game(gamestatehandler):
             self.selection_state =  0
             self.save_name = ""
 
+
     def esc_pressed(key, local_object):
         local_object.quit = True
         local_object.gamestatehandler.state_stack.push(states.Gamestates.FINISH)
@@ -272,6 +275,15 @@ def new_game(gamestatehandler):
             local_object.quit = True
             local_object.gamestatehandler.state_stack.push(states.Gamestates.NEW_GAME_OR_LOAD_SAVE)
 
+        elif local_object.selection_state == 2:
+            if local_object.save_name:
+                local_object.context.gameinfo.savefile_name = local_object.save_name
+                local_object.quit = True
+                local_object.gamestatehandler.state_stack.push(states.Gamestates.SELECT_PLAYSET)
+
+
+
+
 
     local_object = LocalObject(context, gamestatehandler)
 
@@ -288,6 +300,93 @@ def new_game(gamestatehandler):
     terminal.zoom_to(context, 25)
     #printing
     graphics.print_new_game(context, local_object.save_name, local_object.selection_state)
+
+    while not local_object.quit:
+
+        keycallback.check_presses(local_object)
+
+def select_playset(gamestatehandler):
+
+
+    gamestatehandler.state_stack.pop()
+    context = gamestatehandler.context
+
+    terminal.clear()
+    terminal.zoom_to(context, 25)
+
+    #reading playset folder
+    found_playsets = [dir for dir in os.listdir(constants.PLAYSETS_PATH) if os.path.isdir(os.path.join(constants.PLAYSETS_PATH, dir))]
+
+
+    class LocalObject:
+
+        def __init__(self):
+
+            self.quit = False
+            self.state_stack = None
+            self.context = None
+            #0: Back, 1: Playset
+            self.selection_state = 1
+            self.num_playsets = None
+            self.found_playsets = None
+            self.scroll = 0
+            self.redraw = None
+            self.objects_shown = 5
+
+
+
+    local_object = LocalObject()
+    local_object.context = context
+    local_object.state_stack = gamestatehandler.state_stack
+    local_object.found_playsets = found_playsets.copy()
+    local_object.num_playsets = len(local_object.found_playsets)
+
+    def esc_pressed(key, local_object):
+
+        local_object.quit = True
+        local_object.state_stack.push(states.Gamestates.FINISH)
+
+    def enter_pressed(key, local_object):
+
+        if local_object.selection_state == 0:
+            local_object.quit = True
+            local_object.state_stack.push(states.Gamestates.NEW_GAME_OR_LOAD_SAVE)
+
+
+    def s_pressed(key, local_object):
+
+        if (local_object.scroll < local_object.num_playsets - 1 - local_object.objects_shown):
+            local_object.scroll += 1
+            graphics.print_select_playset(local_object)
+
+    def w_pressed(key, local_object):
+
+        if (local_object.scroll > 0):
+            local_object.scroll -= 1
+            graphics.print_select_playset(local_object)
+
+    def a_pressed(key, local_object):
+
+        local_object.selection_state += 1
+        local_object.selection_state %= 2
+        graphics.print_select_playset(local_object)
+
+    def d_pressed(key, local_object):
+
+        local_object.selection_state += 1
+        local_object.selection_state %= 2
+        graphics.print_select_playset(local_object)
+
+
+    keycallback = terminal.KeyCallback()
+    keycallback.register_key("esc", esc_pressed)
+    keycallback.register_key("enter", enter_pressed)
+    keycallback.register_key("w", w_pressed)
+    keycallback.register_key("s", s_pressed)
+    keycallback.register_key("a", a_pressed)
+    keycallback.register_key("d", d_pressed)
+
+    graphics.print_select_playset(local_object)
 
     while not local_object.quit:
 

@@ -13,5 +13,7 @@ colorama.init()
 if not terminal.terminal_is_maximized():
     terminal.toggle_terminal_size()
 
+terminal.disable_scrollback()
+
 handler = GamestateHandler()
 handler.run()

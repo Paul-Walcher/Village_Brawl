@@ -188,6 +188,29 @@ def focus_next(context):
     ])
 
 
+def disable_scrollback():
+    """Enter the alternate screen buffer, which has no scrollback."""
+    sys.stdout.write("\x1b[?1049h")
+    sys.stdout.flush()
+
+
+def enable_scrollback():
+    """Leave the alternate screen buffer and return to the normal terminal."""
+    sys.stdout.write("\x1b[?1049l")
+    sys.stdout.flush()
+
+class ScrollEnable:
+
+    def __init__(self):
+        pass
+
+    def __enter__(self):
+        enable_scrollback()
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        disable_scrollback()
+        return False
 
 def image_to_ascii(path, columns, width_ratio=2.2, full_color=False, monochrome=False):
     art = ascii_magic.from_image(path)
@@ -351,6 +374,7 @@ def scroll_up(n):
         key_up(VK_CONTROL)
 
 
+
 def scroll_down(n):
     for i in range(n):
         key_down(VK_CONTROL)
@@ -377,11 +401,13 @@ def scroll_page_down(n):
         key_up(VK_SHIFT)
         key_up(VK_CONTROL)
 
+def scroll(n):
 
-def reset_scroll():
+    if (n < 0):
+        scroll_up(abs(n))
+    else:
+        scroll_down(n)
 
-    scroll = get_scroll_position()
-    scroll_up(scroll)
 
 def visible_length(text):
     text = ANSI_ESCAPE.sub("", text)

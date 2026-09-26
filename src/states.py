@@ -14,6 +14,7 @@ class Gamestates(Enum):
     INTRO = auto()
     NEW_GAME_OR_LOAD_SAVE = auto()
     NEW_GAME = auto()
+    SELECT_PLAYSET = auto()
 
     FINISH = auto()
     EXIT = auto()
