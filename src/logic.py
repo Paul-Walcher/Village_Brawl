@@ -239,6 +239,10 @@ def new_game(gamestatehandler):
             return
 
         if key in constants.VALID_SYMBOLS:
+
+            if keyboard.is_pressed("-") and keyboard.is_pressed("shift"):
+                key = "_"
+
             local_object.save_name += key
             local_object.selection_state = 0
             graphics.print_new_game(local_object.context, local_object.save_name, local_object.selection_state)

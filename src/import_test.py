@@ -10,13 +10,11 @@ import terminal_functions as terminal
 
 if __name__ == "__main__":
 
-    head, tail = os.path.split(os.path.abspath(__file__))
-    import_folder = os.path.join(head, "import_test_folder")
-    filename = "test.py"
-    module = importlib.import_module(f"import_test_folder.test")
-    globals()[filename[:-3]] = module
-    module = importlib.import_module(f"import_test_folder.test2")
-    globals()[filename[:-3]] = module
+    import_folder = "import_test_folder.test_folder"
+    module = importlib.import_module(f"{import_folder}.test")
+    globals()["test"] = module
+    module = importlib.import_module(f"{import_folder}.test2")
+    globals()["test2"] = module
 
 
     test.hi()

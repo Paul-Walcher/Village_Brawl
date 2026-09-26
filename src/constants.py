@@ -13,4 +13,4 @@ INTRO_IMAGES = ["Wood.png", "Twig.png", "Stone.png", "Pebble.png"]
 
 SCRIPT_DIR = lambda: os.path.dirname(os.path.abspath(__file__))
 
-VALID_SYMBOLS = [chr(x) for x in range(97, 97+26)] + [chr(x) for x in range(48, 58)]
+VALID_SYMBOLS = [chr(x) for x in range(97, 97+26)] + [chr(x) for x in range(48, 58)] + ["_", "#"]

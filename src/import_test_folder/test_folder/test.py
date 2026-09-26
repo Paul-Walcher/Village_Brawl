@@ -1,5 +1,5 @@
 import terminal_functions as terminal
-import import_test_folder.test2 as test2
+import import_test_folder.test_folder.test2 as test2
 
 
 def hi():
