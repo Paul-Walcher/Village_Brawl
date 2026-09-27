@@ -1,3 +1,6 @@
+import os
+import sys
+
 import assets.ascii_assets as ascii_assets
 import terminal_functions as terminal
 import colorama
@@ -15,6 +18,8 @@ if not terminal.terminal_is_maximized():
 
 if not constants.__DEBUG__:
     terminal.disable_scrollback()
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 handler = GamestateHandler()
 handler.run()

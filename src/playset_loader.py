@@ -3,6 +3,9 @@
 Used for loading a playset.
 """
 import os
+import sys
+import importlib
+
 import time
 
 import constants
@@ -10,6 +13,15 @@ import constants
 
 def load_playset(context):
 
-    playset_path = os.path.join(constants.PLAYSETS_PATH, context.gameinfo.current_playset)
+    modules = context.modules
 
-    time.sleep(5)
+    playset_path = constants.PLAYSETS_FOLDER + "." + context.gameinfo.current_playset
+    #loading the explorer
+    explorer_module = importlib.import_module(f"{playset_path}.explorer")
+    modules.explorer_module = explorer_module
+    explorer_mappings_module = importlib.import_module(f"{playset_path}.explorer_mappings")
+    modules.explorer_mappings_module = explorer_mappings
+
+    modules.create_refs()
+
+    time.sleep(3)

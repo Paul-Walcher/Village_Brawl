@@ -6,15 +6,15 @@ from abc import ABC, abstractmethod
 from enum import Enum, auto
 
 
-class Explorer(ABC):
+class Explorer_Template(ABC):
 
-    def __init__(self,  name: str,
-                        description: str,
+    def __init__(self,  name: str = "",
+                        description: str = "",
                         ability_name: str = "",
                         card_image_path: str = "",
                         standard_image_path: str = "",
                         lives: int = 5,
-                        ability_activation_phases = None
+                        ability_activation_phases = None,
                         inventory_size: float = 10.0,
                         starting_items: dict = None,
                         starting_cards: dict = None,

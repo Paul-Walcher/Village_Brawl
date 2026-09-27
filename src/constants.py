@@ -10,7 +10,7 @@ __DEBUG__ = False
 IMAGE_PATH = os.path.join("assets", "images")
 STANDARD_IMAGE_PATH = os.path.join(IMAGE_PATH, "standard_images")
 CARD_IMAGE_PATH = os.path.join(IMAGE_PATH, "card_images")
-PLAYSETS_PATH = "playsets"
+PLAYSETS_FOLDER = "playsets"
 
 INTRO_IMAGES = ["Wood.png", "Twig.png", "Stone.png", "Pebble.png"]
 

@@ -3,6 +3,8 @@ Global context to be given to each function
 dealing with interactions.
 """
 
+import playset_loader
+
 class Settings:
 
     def __init__(self):
@@ -55,6 +57,36 @@ class Gameinfo:
         self.savefile_name = other_gameinfo.savefile_name
         self.current_playset = other_gameinfo.current_playset
 
+class Modules:
+
+    def __init__(self):
+
+        self.explorer_module = None
+        self.explorer_mappings_module = None
+
+        #refs
+        self.explorer_mappings = None
+        self.explorer_enums = None
+
+    def create_refs(self):
+
+        if (self.explorer_mappings_module is not None):
+
+            self.explorer_mappings = self.explorer_mappings_module.explorer_mappings
+            self.explorer_enums = self.explorer_mappings_module.ExplorerMappingsEnum
+
+
+    def copy(self):
+
+        modules_copy = Modules()
+        modules_copy.explorer_module = self.explorer_module
+        modules_copy.explorer_mappings_module = self.explorer_mappings_module
+
+        modules_copy.create_refs()
+
+        return modules_copy
+
+
 
 class Global_Context:
 
@@ -62,6 +94,7 @@ class Global_Context:
 
         self.settings = Settings()
         self.gameinfo = Gameinfo()
+        self.modules = Modules()
 
         self.current_zoom = 0 #positive means zoomed in, negative means zoomed out
         self.current_scroll = 0
@@ -77,9 +110,12 @@ class Global_Context:
 
         settings_copy = self.settings.copy()
         gameinfo_copy = self.gameinfo.copy()
+        modules_copy = self.modules.copy()
 
         context_copy.settings = settings_copy
         context_copy.gameinfo = gameinfo_copy
+        context_copy.modules = modules_copy
+
         context_copy.current_zoom = self.current_zoom
         context_copy.current_scroll = self.current_scroll
         context_copy.cursor_visible = self.cursor_visible
