@@ -12,7 +12,7 @@ asset_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 standard_asset_path = os.path.join(asset_path, "standard_assets")
 card_asset_path = os.path.join(asset_path, "card_assets")
 
-class BasicExplorer(Explorer_Template):
+class Basic_Explorer(Explorer_Template):
 
     def __init__(self):
 

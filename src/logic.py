@@ -119,6 +119,9 @@ def finish(gamestatehandler):
 
     terminal.clear_keyboard_buffer()
 
+    modules = gamestatehandler.context.modules
+
+
 def new_game_or_save_selection(gamestatehandler):
 
     #for either selecting a new game or

@@ -8,5 +8,5 @@ class ExplorerMappingsEnum(Enum):
     BASIC_EXPLORER = auto()
 
 explorer_mappings = {
-                        ExplorerMappingsEnum.BASIC_EXPLORER: explorer.BasicExplorer
+                        ExplorerMappingsEnum.BASIC_EXPLORER: explorer.Basic_Explorer()
                     }
