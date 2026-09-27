@@ -5,7 +5,7 @@ Constants used in the  program
 
 import os
 
-__DEBUG__ = True
+__DEBUG__ = False
 
 IMAGE_PATH = os.path.join("assets", "images")
 STANDARD_IMAGE_PATH = os.path.join(IMAGE_PATH, "standard_images")

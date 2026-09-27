@@ -100,7 +100,7 @@ class KeyCallback:
 
     def register_key(self, key, callback):
 
-        self.keys_callback[key] = [False, callback]
+        self.keys_callback[key] = [keyboard.is_pressed(key), callback]
 
     def unregister_key(self, key):
 

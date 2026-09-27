@@ -326,7 +326,7 @@ def select_playset(gamestatehandler):
     context = gamestatehandler.context
 
     terminal.clear()
-    terminal.zoom_to(context, 25)
+    terminal.zoom_to(context, 10)
 
     #reading playset folder
     found_playsets = [dir for dir in os.listdir(constants.PLAYSETS_PATH) if os.path.isdir(os.path.join(constants.PLAYSETS_PATH, dir))]
@@ -373,7 +373,7 @@ def select_playset(gamestatehandler):
 
     def s_pressed(key, local_object):
 
-        if (local_object.scroll < local_object.num_playsets - 1 - local_object.objects_shown):
+        if (local_object.scroll < local_object.num_playsets - 1):
             local_object.scroll += 1
             graphics.print_select_playset(local_object)
 
@@ -419,7 +419,6 @@ def load_playset(gamestatehandler):
     terminal.zoom_to(gamestatehandler.context, 0)
 
     graphics.print_loading_screen(0)
-    time.sleep(0.1)
 
     lock = threading.Lock()
 
