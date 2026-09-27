@@ -255,7 +255,11 @@ def image_to_ascii_from_context(path, columns, context):
                             full_color=context.settings.full_color, monochrome=context.settings.monochrome_assets)
 
 
+def render_text(font, text):
 
+    figlet = pyfiglet.Figlet()
+    figlet.setFont(font=font)
+    return figlet.renderText(text)
 
 def toggle_terminal_size():
     pyautogui.press("f11")

@@ -180,3 +180,12 @@ def print_select_playset(local_object):
             terminal.color_reset()
         else:
             print("Back")
+
+def print_loading_screen(dots):
+
+    with NewPage():
+
+        print("\n"*20)
+        text = "Loading ." + "." * dots
+        text = terminal.render_text("ansi_shadow", text)
+        terminal.print_centered(text)

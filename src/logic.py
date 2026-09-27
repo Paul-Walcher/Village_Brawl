@@ -16,7 +16,7 @@ import settings_reader
 import keyboard
 import states
 from states import Gamestates
-
+import playset_loader
 
 KEY_RELEASE_BUFEER = 0.5
 
@@ -54,6 +54,19 @@ class Zoomrestore:
     def __exit__(self, exc_type, exc_value, traceback):
         Zoomrestore.restore_zoom(self.context, self.snapshot)
         return False
+
+class Clock:
+
+    def __init__(self):
+        self.start_time = 0
+
+    def start(self):
+        #in ms
+        self.start_time = time.perf_counter() * 10E6
+
+    def elapsed(self):
+
+        return (time.perf_counter() * 10E6) - self.start_time
 
 def intro(gamestatehandler):
 
@@ -354,6 +367,7 @@ def select_playset(gamestatehandler):
             local_object.state_stack.push(states.Gamestates.NEW_GAME_OR_LOAD_SAVE)
         elif local_object.selection_state == 1:
             local_object.quit = True
+            local_object.context.gameinfo.current_playset = local_object.found_playsets[local_object.scroll]
             local_object.state_stack.push(states.Gamestates.LOAD_PLAYSET)
 
 
@@ -399,4 +413,75 @@ def select_playset(gamestatehandler):
 def load_playset(gamestatehandler):
 
     gamestatehandler.state_stack.pop()
+    terminal.clear()
+
+
+    terminal.zoom_to(gamestatehandler.context, 0)
+
+    graphics.print_loading_screen(0)
+    time.sleep(0.1)
+
+    lock = threading.Lock()
+
+    class LocalObject:
+
+        def __init__(self):
+
+            self.gamestatehandler = None
+            self.lock = None
+            self.loading_finished = False
+            self.clock = None
+            self.dots = 0
+
+    local_object = LocalObject()
+    local_object.gamestatehandler = gamestatehandler
+    local_object.lock = lock
+    local_object.clock = Clock()
+
+    def loading_rendering(local_object):
+
+        context = local_object.gamestatehandler.context
+        clock = local_object.clock
+        lock = local_object.lock
+
+        update_time = 0.5 * 10E6
+        max_dots = 4
+
+        quit = False
+
+        clock.start()
+
+        while not quit:
+
+            with lock:
+                if local_object.loading_finished:
+                    quit = True
+
+            if clock.elapsed() > update_time:
+
+                local_object.dots += 1
+                local_object.dots %= max_dots
+                clock.start()
+
+            graphics.print_loading_screen(local_object.dots)
+
+
+    def loading_playset(local_object):
+
+        context = local_object.gamestatehandler.context
+        playset_loader.load_playset(context)
+
+        with local_object.lock:
+
+            local_object.loading_finished = True
+
+    t1 = threading.Thread(target=loading_rendering, args=(local_object,))
+    t2 = threading.Thread(target=loading_playset, args=(local_object,))
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+
     gamestatehandler.state_stack.push(states.Gamestates.FINISH)
