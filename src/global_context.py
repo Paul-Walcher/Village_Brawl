@@ -39,11 +39,13 @@ class Gameinfo:
     def __init__(self):
 
         self.savefile_name = None
+        self.current_playset = None
 
     def copy(self):
 
         gameinfo_copy = Gameinfo()
         gameinfo_copy.savefile_name = self.savefile_name
+        gameinfo_copy.current_playset = self.current_playset
 
         return gameinfo_copy
 
@@ -51,6 +53,7 @@ class Gameinfo:
 
         #savefile name
         self.savefile_name = other_gameinfo.savefile_name
+        self.current_playset = other_gameinfo.current_playset
 
 
 class Global_Context:

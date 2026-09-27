@@ -6,6 +6,7 @@ import os
 import sys
 import random
 import time
+import threading
 
 import constants
 import global_context
@@ -351,6 +352,9 @@ def select_playset(gamestatehandler):
         if local_object.selection_state == 0:
             local_object.quit = True
             local_object.state_stack.push(states.Gamestates.NEW_GAME_OR_LOAD_SAVE)
+        elif local_object.selection_state == 1:
+            local_object.quit = True
+            local_object.state_stack.push(states.Gamestates.LOAD_PLAYSET)
 
 
     def s_pressed(key, local_object):
@@ -391,3 +395,8 @@ def select_playset(gamestatehandler):
     while not local_object.quit:
 
         keycallback.check_presses(local_object)
+
+def load_playset(gamestatehandler):
+
+    gamestatehandler.state_stack.pop()
+    gamestatehandler.state_stack.push(states.Gamestates.FINISH)

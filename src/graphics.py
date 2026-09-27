@@ -162,12 +162,16 @@ def print_select_playset(local_object):
         terminal.print_centered("Select your Playset", text_color=(43,220,221))
         print("\n"*4)
 
-        if (selection_state == 1):
-            print_highlighted(playsets[local_object.scroll])
-        else:
-            terminal.print_centered(playsets[local_object.scroll])
-        for i in range(min(objects_shown, len(playsets) - local_object.scroll)):
-            terminal.print_centered(playsets[local_object.scroll + i + 1])
+        if len(playsets) > 0:
+            if (selection_state == 1):
+                print_highlighted(playsets[local_object.scroll])
+            else:
+                terminal.print_centered(playsets[local_object.scroll])
+
+            min_print =  len(playsets) - local_object.scroll - 1
+            min_print = (min_print if min_print > 0 else 0)
+            for i in range(min(objects_shown, min_print)):
+                terminal.print_centered(playsets[local_object.scroll + i + 1])
 
         print("\n"*3)
         if (selection_state == 0):
