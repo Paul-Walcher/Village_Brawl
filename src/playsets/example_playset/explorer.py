@@ -3,12 +3,12 @@ Explorer definitions
 """
 import os
 
-import templates.explorer_template.Explorer_Template as Explorer_Template
+from templates.explorer_template import Explorer_Template
 
 
 
 
-asset_path = os.path.join(os.path.abspath(__file__).dirname(), "assets")
+asset_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 standard_asset_path = os.path.join(asset_path, "standard_assets")
 card_asset_path = os.path.join(asset_path, "card_assets")
 
@@ -36,3 +36,6 @@ class BasicExplorer(Explorer_Template):
 
     def activate_ability(self, phase, context):
         pass
+
+def hi():
+    print("HELLO")

@@ -474,15 +474,13 @@ def load_playset(gamestatehandler):
 
             local_object.loading_finished = True
 
-    #t1 = threading.Thread(target=loading_rendering, args=(local_object,))
+    t1 = threading.Thread(target=loading_rendering, args=(local_object,))
     t2 = threading.Thread(target=loading_playset, args=(local_object,))
 
-    #t1.start()
+    t1.start()
     t2.start()
 
-    #t1.join()
+    t1.join()
     t2.join()
-
-    time.sleep(5)
 
     gamestatehandler.state_stack.push(states.Gamestates.FINISH)

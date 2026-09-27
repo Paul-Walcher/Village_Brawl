@@ -1,6 +1,6 @@
 
 from enum import Enum, auto
-import playsets.example_playset.explorer as explorers
+import playsets.example_playset.explorer as explorer
 
 
 class ExplorerMappingsEnum(Enum):
@@ -8,5 +8,5 @@ class ExplorerMappingsEnum(Enum):
     BASIC_EXPLORER = auto()
 
 explorer_mappings = {
-                        ExplorerMappings.BASIC_EXPLORER: explorers.BasicExplorer
+                        ExplorerMappingsEnum.BASIC_EXPLORER: explorer.BasicExplorer
                     }
