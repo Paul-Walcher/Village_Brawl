@@ -9,13 +9,14 @@ class Phases(Enum):
     AFTER_BIOME_CARD_REVEAL = auto()
     START_OF_WAVE_BEFORE_DRAW = auto()
     START_OF_WAVE_AFTER_DRAW = auto()
-    BEFORE_BATTLE = auto()
-    AFTER_BATTLE = auto()
     #gets the information of the card activation, village or explorer
-    AT_CARD_ACTIVATION = auto()
-    AT_ENEMY_CARD_ACTIVATION = auto()
+    BEFORE_CARD_ACTIVATION = auto()
+    AFTER_CARD_ACTIVATION = auto()
+    BEFORE_ENEMY_CARD_ACTIVATION = auto()
+    AFTER_ENEMY_CARD_ACTIVATION = auto()
     #gets the information of the enemy ability
-    AT_ENEMY_ABILITY_ACTIVATION = auto()
+    BEFORE_ENEMY_ABILITY_ACTIVATION = auto()
+    AFTER_ENEMY_ABILITY_ACTIVATION = auto()
 
     #Village
     BEFORE_VILLAGE_PHASE = auto()
