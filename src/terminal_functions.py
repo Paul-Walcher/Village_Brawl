@@ -252,7 +252,7 @@ def image_to_background_ascii(
     path,
     columns,
     width_ratio=1.8,
-    saturation=1.6,
+    saturation=1.8,
     contrast=1.6,
     brightness=0.9,
     black_threshold=50,
