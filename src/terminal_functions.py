@@ -13,7 +13,7 @@ import re
 import time
 import subprocess
 import sys
-
+import colorsys
 
 from wcwidth import wcswidth, center
 import pyfiglet
@@ -248,12 +248,86 @@ def image_to_ascii(path, columns, width_ratio=2.2, full_color=False, monochrome=
         text = ANSI_ESCAPE.sub('', text)
     return text
 
+def image_to_background_ascii(
+    path,
+    columns,
+    width_ratio=1.8,
+    saturation=1.6,
+    contrast=1.6,
+    brightness=0.9,
+    black_threshold=50,
+):
+    art = ascii_magic.from_image(path)
 
+    characters = art.to_character_list(
+        columns=columns,
+        width_ratio=width_ratio,
+        full_color=True
+    )
+
+    lines = []
+
+    for row in characters:
+        line = ""
+
+        for item in row:
+
+            if item["character"] == " ":
+                line += "\033[49m "
+                continue
+
+            hex_color = item["full-hex-color"]
+
+            r = int(hex_color[1:3], 16)
+            g = int(hex_color[3:5], 16)
+            b = int(hex_color[5:7], 16)
+
+            # Very dark pixels become the terminal background color
+            if max(r, g, b) < black_threshold:
+                r = g = b = 12
+            else:
+                # RGB -> HSV
+                h, s, v = colorsys.rgb_to_hsv(
+                    r / 255,
+                    g / 255,
+                    b / 255
+                )
+
+                # Make colors more vivid
+                s = min(1.0, s * saturation)
+
+                # Brighten using gamma correction
+                # brightness < 1.0 = brighter
+                v = v ** brightness
+
+                # Increase contrast around the middle brightness
+                v = (v - 0.5) * contrast + 0.5
+                v = max(0.0, min(1.0, v))
+
+                # HSV -> RGB
+                r, g, b = colorsys.hsv_to_rgb(h, s, v)
+
+                r = int(r * 255)
+                g = int(g * 255)
+                b = int(b * 255)
+
+            line += f"\033[48;2;{r};{g};{b}m "
+
+        # Restore terminal background
+        line += "\033[49m "
+        lines.append(line)
+
+    return "\033[49m " + "\n".join(lines) + "\033[0m"
 
 def image_to_ascii_from_context(path, columns, context, width_ratio=2.2):
-    return image_to_ascii(path, columns,
-                            full_color=context.settings.full_color, monochrome=context.settings.monochrome_assets,
-                            width_ratio=width_ratio)
+
+    if context.settings.ascii_art:
+        return image_to_ascii(path, columns,
+                                full_color=context.settings.full_color, monochrome=context.settings.monochrome_assets,
+                                width_ratio=width_ratio)
+
+    else:
+        return image_to_background_ascii(path, columns, width_ratio)
 
 
 def render_text(font, text):
@@ -348,12 +422,12 @@ def reset_zoom(context):
 
 def zoom_to(context, zoom, buffer_t=0.01):
 
-    diff = zoom - context.current_zoom
+    reset_zoom(context)
 
-    if (diff > 0):
-        zoom_in(context, diff, buffer_time=buffer_t)
-    if (diff < 0):
-        zoom_out(context, abs(diff), buffer_time=buffer_t)
+    if (zoom > 0):
+        zoom_in(context, zoom, buffer_time=buffer_t)
+    if (zoom < 0):
+        zoom_out(context, abs(zoom), buffer_time=buffer_t)
 
 
 def key_down(vk):

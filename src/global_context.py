@@ -15,8 +15,11 @@ class Settings:
         #for images, secifies the columns used for the ascii transform
         self.low_res = 50
         self.mid_res = 100
-        self.high_res = 200
-        self.very_high_res = 400
+        self.high_res = 125
+        self.very_high_res = 150
+        self.HD = 200
+        self.Ultra_HD = 400
+        self.ascii_art = False
 
     def copy(self):
 
@@ -28,6 +31,9 @@ class Settings:
         settings_copy.mid_res = self.mid_res
         settings_copy.high_res = self.high_res
         settings_copy.very_high_res = self.very_high_res
+        settings_copy.HD = self.HD
+        settings_copy.Ultra_HD = self.Ultra_HD
+        settings_copy.ascii_art = self.ascii_art
 
         return settings_copy
 

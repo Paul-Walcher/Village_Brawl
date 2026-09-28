@@ -27,6 +27,9 @@ def read_settings(global_context: Global_Context):
             local_context.settings.mid_res = data["mid_res"]
             local_context.settings.high_res = data["high_res"]
             local_context.settings.very_high_res = data["very_high_res"]
+            local_context.settings.HD = data["HD"]
+            local_context.settings.Ultra_HD = data["Ultra_HD"]
+            local_context.settings.ascii_art = data["ascii_art"]
 
     except Exception as e:
 

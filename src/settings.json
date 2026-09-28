@@ -2,9 +2,12 @@
 
   "monochrome_assets": false,
   "full_color": false,
+  "ascii_art": false,
 
   "low_res": 50,
   "mid_res": 100,
   "high_res": 125,
-  "very_high_res": 150
+  "very_high_res": 150,
+  "HD": 250,
+  "Ultra_HD": 500
 }
