@@ -22,6 +22,8 @@ class Explorer_Template(ABC):
 
         #name
         self.name = name
+        #namecolor, shown in the selection screen
+        self.name_color = (255, 255, 255)
         #description
         self.description = description
         #card image path

@@ -46,6 +46,7 @@ class GamestateHandler:
                             Gamestates.NEW_GAME: logic.new_game,
                             Gamestates.SELECT_PLAYSET: logic.select_playset,
                             Gamestates.LOAD_PLAYSET: logic.load_playset,
+                            Gamestates.CHOOSE_EXPLORER: logic.choose_explorer,
 
                             Gamestates.FINISH: lambda x: Gamestates.FINISH,
                             Gamestates.EXIT: lambda x: Gamestates.EXIT

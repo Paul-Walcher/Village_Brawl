@@ -5,6 +5,6 @@
 
   "low_res": 50,
   "mid_res": 100,
-  "high_res": 200,
-  "very_high_res": 400
+  "high_res": 125,
+  "very_high_res": 150
 }

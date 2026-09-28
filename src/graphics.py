@@ -226,3 +226,28 @@ def print_loading_screen(dots):
         text = "Loading ." + "." * dots
         text = terminal.render_text("ansi_shadow", text)
         terminal.print_centered(text)
+
+def print_explorer(local_object):
+
+    context = local_object.context
+    explorer_enum = local_object.explorers[local_object.explorer_index]
+    explorer_ref = local_object.modules.explorer_mappings[explorer_enum]
+
+    name = explorer_ref.name
+    name_color = explorer_ref.name_color
+    image = explorer_ref.standard_image_path
+
+    bottom_text = "<" + " "*20 + ">"
+    name_rendered = terminal.render_text("big", name)
+    bottom_text_rendered = terminal.render_text("3d-ascii", bottom_text)
+
+    resolution = context.settings.high_res
+
+    image_rendered = terminal.image_to_ascii_from_context(image, resolution, context, width_ratio=3.0)
+
+    with NewPage():
+
+        terminal.print_centered(name_rendered, text_color=name_color)
+        print("\n")
+        terminal.print_centered(image_rendered)
+        terminal.print_centered(bottom_text_rendered)

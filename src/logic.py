@@ -488,4 +488,49 @@ def load_playset(gamestatehandler):
     t1.join()
     t2.join()
 
+    gamestatehandler.state_stack.push(states.Gamestates.CHOOSE_EXPLORER)
+
+def choose_explorer(gamestatehandler):
+
+    gamestatehandler.state_stack.pop()
+    context = gamestatehandler.context
+    modules = context.modules
+
+    explorers = list(modules.explorer_mappings.keys())
+
+    terminal.clear()
+    terminal.zoom_to(context, -1)
+
+    class LocalObject:
+
+        def __init__(self):
+
+            self.gamestatehandler = None
+            self.context = None
+            self.modules = None
+            self.explorers = None
+            self.explorer_index = 0
+            self.show_info = False
+            self.quit = False
+
+    local_object = LocalObject()
+    local_object.gamestatehandler = gamestatehandler
+    local_object.context = context
+    local_object.modules = modules
+    local_object.explorers = explorers
+
+    graphics.print_explorer(local_object)
+
+    def enter_pressed(key, local_object):
+        local_object.quit = True
+
+    keycallback = terminal.KeyCallback()
+    keycallback.register_key("enter", enter_pressed)
+
+    while not local_object.quit:
+
+        keycallback.check_presses(local_object)
+
+
+
     gamestatehandler.state_stack.push(states.Gamestates.FINISH)

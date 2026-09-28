@@ -250,9 +250,10 @@ def image_to_ascii(path, columns, width_ratio=2.2, full_color=False, monochrome=
 
 
 
-def image_to_ascii_from_context(path, columns, context):
+def image_to_ascii_from_context(path, columns, context, width_ratio=2.2):
     return image_to_ascii(path, columns,
-                            full_color=context.settings.full_color, monochrome=context.settings.monochrome_assets)
+                            full_color=context.settings.full_color, monochrome=context.settings.monochrome_assets,
+                            width_ratio=width_ratio)
 
 
 def render_text(font, text):

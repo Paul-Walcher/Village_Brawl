@@ -19,6 +19,7 @@ class Basic_Explorer(Explorer_Template):
         super().__init__()
 
         self.name = "Basic Explorer"
+        self.name_color = (255, 144, 0)
         self.description = "Basic Explorer. Has no special abilities."
 
         self.ability_name = "-"
