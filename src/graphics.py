@@ -227,16 +227,16 @@ def print_loading_screen(dots):
         text = terminal.render_text("ansi_shadow", text)
         terminal.print_centered(text)
 
-def print_hd_image(context, image_path):
+def print_ultra_hd_image(context, image_path):
 
     with NewPage():
         resolution = context.settings.Ultra_HD
-        image_rendered = terminal.image_to_ascii_from_context(image_path, resolution, context, width_ratio=3.0)
+        image_rendered = terminal.image_to_ascii_from_context(image_path, resolution, context, width_ratio=2.6)
 
         terminal.print_centered(image_rendered)
 
 
-def print_hd_explorer(local_object):
+def print_ultra_hd_explorer(local_object):
 
     context = local_object.context
     explorer_enum = local_object.explorers[local_object.explorer_index]
@@ -246,7 +246,7 @@ def print_hd_explorer(local_object):
     name_color = explorer_ref.name_color
     image = explorer_ref.card_image_path
 
-    print_hd_image(context, image)
+    print_ultra_hd_image(context, image)
 
 
 

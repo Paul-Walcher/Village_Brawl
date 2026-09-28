@@ -21,6 +21,8 @@ class Settings:
         self.Ultra_HD = 400
         self.ascii_art = False
 
+        self.ultra_hd_image_key = "alt"
+
     def copy(self):
 
         settings_copy = Settings()
@@ -34,6 +36,7 @@ class Settings:
         settings_copy.HD = self.HD
         settings_copy.Ultra_HD = self.Ultra_HD
         settings_copy.ascii_art = self.ascii_art
+        settings_copy.ultra_hd_image_key = self.ultra_hd_image_key
 
         return settings_copy
 

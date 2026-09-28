@@ -533,7 +533,7 @@ def choose_explorer(gamestatehandler):
     def enter_pressed(key, local_object):
         local_object.quit = True
 
-    def alt_pressed(key, local_object):
+    def ultra_hd_key_pressed(key, local_object):
 
         context = local_object.context
 
@@ -541,7 +541,7 @@ def choose_explorer(gamestatehandler):
 
         if local_object.current_state == local_object.explorer_preview:
             terminal.zoom_to(context, -8)
-            graphics.print_hd_explorer(local_object)
+            graphics.print_ultra_hd_explorer(local_object)
             local_object.current_state = local_object.explorer_hd
         elif local_object.current_state == local_object.explorer_hd:
             terminal.zoom_to(context, -1)
@@ -550,7 +550,7 @@ def choose_explorer(gamestatehandler):
 
     keycallback = terminal.KeyCallback()
     keycallback.register_key("enter", enter_pressed)
-    keycallback.register_key("alt", alt_pressed)
+    keycallback.register_key(context.settings.ultra_hd_image_key, ultra_hd_key_pressed)
 
     while not local_object.quit:
 
