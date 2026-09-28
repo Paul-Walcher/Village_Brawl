@@ -36,6 +36,3 @@ class Basic_Explorer(Explorer_Template):
 
     def activate_ability(self, phase, context):
         pass
-
-def hi():
-    print("HELLO")

@@ -17,6 +17,7 @@ import keyboard
 import states
 from states import Gamestates
 import playset_loader
+import phases
 
 KEY_RELEASE_BUFEER = 0.5
 
@@ -119,7 +120,8 @@ def finish(gamestatehandler):
 
     terminal.clear_keyboard_buffer()
 
-    modules = gamestatehandler.context.modules
+
+
 
 
 def new_game_or_save_selection(gamestatehandler):
@@ -332,7 +334,7 @@ def select_playset(gamestatehandler):
     terminal.zoom_to(context, 10)
 
     #reading playset folder
-    found_playsets = [dir for dir in os.listdir(constants.PLAYSETS_FOLDER) if os.path.isdir(os.path.join(constants.PLAYSETS_FOLDER, dir))]
+    found_playsets = [dir for dir in os.listdir(constants.PLAYSETS_FOLDER_PATH) if os.path.isdir(os.path.join(constants.PLAYSETS_FOLDER_PATH, dir))]
 
 
     class LocalObject:

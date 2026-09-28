@@ -31,3 +31,6 @@ class Phases(Enum):
     AFTER_USING_ITEM = auto()
     BEFORE_CRAFTING = auto()
     AFTER_CRAFTING = auto()
+
+
+all_phases = list(Phases)
