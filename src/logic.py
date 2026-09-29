@@ -540,7 +540,7 @@ def choose_explorer(gamestatehandler):
         terminal.zoom_to(context, 0)
 
         if local_object.current_state == local_object.explorer_preview:
-            terminal.zoom_to(context, -8)
+            terminal.zoom_to(context, 20)
             graphics.print_ultra_hd_explorer(local_object)
             local_object.current_state = local_object.explorer_hd
         elif local_object.current_state == local_object.explorer_hd:

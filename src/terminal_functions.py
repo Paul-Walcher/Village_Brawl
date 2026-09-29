@@ -15,7 +15,7 @@ import subprocess
 import sys
 import colorsys
 
-from wcwidth import wcswidth, center
+from wcwidth import wcswidth, wcwidth, center
 import pyfiglet
 import pyautogui
 import global_context
@@ -592,6 +592,106 @@ def show_cursor(context):
     print("\033[?25h", end="")
     context.cursor_visible = True
 
+def page_margin_correction(context):
+    """
+
+    """
+
+def terminal_dimensions(context):
+    """
+    Returns the currently visible terminal dimensions.
+
+    Returns:
+        (columns, rows)
+    """
+    size = shutil.get_terminal_size()
+    return (size.columns,
+            size.lines)
+
+def wrap_text(text, columns):
+    """
+    Inserts real '\\n' characters whenever a line reaches `columns`.
+
+    Existing '\\n' characters are preserved.
+    ANSI escape sequences do not count toward the column width.
+    """
+    result = []
+
+    for original_line in text.split("\n"):
+        current = []
+        width = 0
+
+        # Separate ANSI escape sequences from normal characters
+        tokens = re.split(f"({ANSI_ESCAPE.pattern})", original_line)
+
+        for token in tokens:
+            if not token:
+                continue
+
+            # ANSI sequence
+            if ANSI_ESCAPE.fullmatch(token):
+                current.append(token)
+                continue
+
+            # Normal text
+            for char in token:
+                char_width = wcwidth(char)
+
+                if char_width < 0:
+                    char_width = 0
+
+                if width + char_width > columns:
+                    result.append("".join(current))
+                    current = []
+                    width = 0
+
+                current.append(char)
+                width += char_width
+
+        result.append("".join(current))
+
+    return "\n".join(result)
+
+
+def paginate_text(context, texts):
+    """
+    Takes a list of (text, centered) tuples.
+
+    `text`:
+        The text to wrap.
+
+    `centered`:
+        If True, every resulting line is centered within the
+        current terminal width.
+
+    Returns:
+        A list of page strings.
+    """
+    columns, rows = terminal_dimensions(context)
+    columns = int(columns * constants.PAGE_CORRECTION_FACTOR_WIDTH)
+    rows = int(rows * constants.PAGE_CORRECTION_FACTOR_HEIGHT)
+
+    all_lines = []
+
+    for text, centered in texts:
+        # Wrap the text first
+        wrapped = wrap_text(text, columns)
+
+        for line in wrapped.split("\n"):
+            if centered:
+                # Calculate visible width, ignoring ANSI escape sequences
+                width = visible_length(line)
+
+                padding = max(0, (columns - width) // 2)
+
+                line = " " * padding + line
+
+            all_lines.append(line)
+
+    return [
+        "\n".join(all_lines[i:i + rows])
+        for i in range(0, len(all_lines), rows)
+    ]
 """
 ascii fonts
 """
