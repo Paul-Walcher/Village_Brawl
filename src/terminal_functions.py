@@ -493,34 +493,6 @@ def press_ctrl_key(vk, delay=0.05):
 
     time.sleep(delay)
 
-def zoom_in_no_context(n, buffer_time=BUFFER_TIME):
-    for i in range(n):
-        user32.keybd_event(VK_CONTROL, 0, 0, 0)
-        press_key(VK_ADD)
-        user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
-        time.sleep(buffer_time)
-
-def zoom_out_no_context(n, buffer_time=BUFFER_TIME):
-    for i in range(n):
-        user32.keybd_event(VK_CONTROL, 0, 0, 0)
-        press_key(VK_SUBTRACT)
-        user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
-        time.sleep(buffer_time)
-
-def reset_zoom_no_context():
-    keyboard.press_and_release("ctrl+0")
-    context.current_zoom = 0
-    time.sleep(0.1)
-
-def zoom_to_no_context(prev_zoom, zoom, buffer_t=0.01):
-
-    diff = zoom - prev_zoom
-
-    if (diff > 0):
-        zoom_in_no_context(diff, buffer_time=buffer_t)
-    if (diff < 0):
-        zoom_out_no_context(abs(diff), buffer_time=buffer_t)
-
 def press_zoom_key(key, hold_time=0.02, after_time=0.15):
     keyboard.press("ctrl")
     time.sleep(hold_time)
@@ -533,6 +505,29 @@ def press_zoom_key(key, hold_time=0.02, after_time=0.15):
 
     keyboard.release("ctrl")
     time.sleep(after_time)
+
+def zoom_in_no_context(n, buffer_time=0.15):
+    for _ in range(n):
+        press_zoom_key("+", after_time=buffer_time)
+
+def zoom_out_no_context(n, buffer_time=0.15):
+    for _ in range(n):
+        press_zoom_key("-", after_time=buffer_time)
+
+def reset_zoom_no_context(buffer_time=0.5):
+    keyboard.press_and_release("ctrl+0")
+    time.sleep(buffer_time)
+
+
+def zoom_to_no_context(prev_zoom, zoom, buffer_t=0.05):
+
+    zoom = zoom - prev_zoom
+
+    if zoom > 0:
+        zoom_in(context, zoom, buffer_time)
+
+    elif zoom < 0:
+        zoom_out(context, -zoom, buffer_time)
 
 
 def zoom_in(context, n, buffer_time=0.15):
