@@ -22,8 +22,5 @@ SCRIPT_DIR = lambda: os.path.dirname(os.path.abspath(__file__))
 
 VALID_SYMBOLS = [chr(x) for x in range(97, 97+26)] + [chr(x) for x in range(48, 58)] + ["_", "#"]
 
-PAGE_CORRECTION_FACTOR_WIDTH_ZOOM_IN = 1.0
-PAGE_CORRECTION_FACTOR_HEIGHT_ZOOM_IN = 1.0
-
-PAGE_CORRECTION_FACTOR_WIDTH_ZOOM_OUT = 1.0
-PAGE_CORRECTION_FACTOR_HEIGHT_ZOOM_OUT = 1.0
+#color_reset_string
+CYAN = (43,220,221)

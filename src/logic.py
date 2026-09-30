@@ -565,7 +565,9 @@ def choose_explorer(gamestatehandler):
 
     def real_image_pressed(key, local_object):
 
-        terminal.show_real_image(constants.STANDARD_IMAGE_PATH + "\\" + "Twig.png")
+        explorer_enum = local_object.explorers[local_object.explorer_index]
+        explorer_ref = local_object.modules.explorer_mappings[explorer_enum]
+        terminal.show_real_image(explorer_ref.card_image_path)
 
     def ultra_hd_key_pressed(key, local_object):
 
