@@ -547,11 +547,6 @@ def choose_explorer(gamestatehandler):
 
             self.current_state = self.explorer_preview
 
-            self.zoom = 20
-
-
-
-
     local_object = LocalObject()
     local_object.gamestatehandler = gamestatehandler
     local_object.context = context
@@ -569,28 +564,55 @@ def choose_explorer(gamestatehandler):
         explorer_ref = local_object.modules.explorer_mappings[explorer_enum]
         terminal.show_real_image(explorer_ref.card_image_path)
 
-    def ultra_hd_key_pressed(key, local_object):
+    def print_explorer_image(local_object):
 
         context = local_object.context
         if local_object.current_state == local_object.explorer_preview:
-            terminal.zoom_to(context, -10)
-            graphics.print_ultra_hd_explorer(local_object)
-            local_object.current_state = local_object.explorer_hd
-        elif local_object.current_state == local_object.explorer_hd:
             terminal.zoom_to(context, -1)
             graphics.print_explorer(local_object)
+        elif local_object.current_state == local_object.explorer_hd:
+            terminal.zoom_to(context, -10)
+            graphics.print_ultra_hd_explorer(local_object)
+
+    def toggle_explorer_hd_and_print(key, local_object):
+
+        context = local_object.context
+
+        if local_object.current_state == local_object.explorer_preview:
+            local_object.current_state = local_object.explorer_hd
+        elif local_object.current_state == local_object.explorer_hd:
             local_object.current_state = local_object.explorer_preview
+
+        print_explorer_image(local_object)
+
+    def a_pressed(key, local_object):
+
+        context = local_object.context
+        num_explorers = len(local_object.explorers)
+        local_object.explorer_index -= 1
+        local_object.explorer_index %= num_explorers
+
+        print_explorer_image(local_object)
+
+    def d_pressed(key, local_object):
+
+        context = local_object.context
+        num_explorers = len(local_object.explorers)
+        local_object.explorer_index += 1
+        local_object.explorer_index %= num_explorers
+
+        print_explorer_image(local_object)
 
 
     keycallback = terminal.KeyCallback()
     keycallback.register_key("enter", enter_pressed)
-    keycallback.register_key(context.settings.ultra_hd_image_key, ultra_hd_key_pressed)
+    keycallback.register_key(context.settings.ultra_hd_image_key, toggle_explorer_hd_and_print)
     keycallback.register_key(context.settings.real_image_key, real_image_pressed)
+    keycallback.register_key("a", a_pressed)
+    keycallback.register_key("d", d_pressed)
+
 
     while not local_object.quit:
-
         keycallback.check_presses(local_object)
-
-
 
     gamestatehandler.state_stack.push(states.Gamestates.FINISH)
