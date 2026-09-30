@@ -25,5 +25,5 @@ def load_playset(context):
     modules.create_refs()
 
 
-    if not constants.__DEBUG__:
+    if constants.__EXTRA_LOAD_TIME__:
         time.sleep(3)

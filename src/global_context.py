@@ -4,6 +4,9 @@ dealing with interactions.
 """
 
 import playset_loader
+import cv2
+import constants
+import terminal_functions as terminal
 
 class Settings:
 
@@ -22,6 +25,7 @@ class Settings:
         self.ascii_art = False
 
         self.ultra_hd_image_key = "alt"
+        self.real_image_key = "#"
 
     def copy(self):
 
@@ -37,6 +41,7 @@ class Settings:
         settings_copy.Ultra_HD = self.Ultra_HD
         settings_copy.ascii_art = self.ascii_art
         settings_copy.ultra_hd_image_key = self.ultra_hd_image_key
+        settings_copy.real_image_key = self.real_image_key
 
         return settings_copy
 
@@ -111,6 +116,7 @@ class Global_Context:
         self.cursor_visible = True
         self.terminal_handles = {} #handels for terminals
         self.misc = {} # Miscellaneous
+
 
     def copy(self):
 

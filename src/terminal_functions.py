@@ -6,6 +6,7 @@ from ascii_magic import AsciiArt
 import ascii_magic
 
 import ctypes
+from ctypes import wintypes
 import time
 import os
 import shutil
@@ -14,13 +15,23 @@ import time
 import subprocess
 import sys
 import colorsys
+import msvcrt
+import numpy as np
 
 from wcwidth import wcswidth, wcwidth, center
 import pyfiglet
 import pyautogui
+import cv2
+
+import threading
 import global_context
 import keyboard
 import constants
+from logic import Stack
+
+import multiprocessing
+import queue
+
 
 
 user32 = ctypes.windll.user32
@@ -86,6 +97,9 @@ class CONSOLE_SCREEN_BUFFER_INFO(ctypes.Structure):
         ("dwMaximumWindowSize", COORD),
     ]
 
+
+
+
 class ExitSignal:
 
     def __init__(self):
@@ -121,6 +135,97 @@ class KeyCallback:
 
             elif not keyboard.is_pressed(key) and self.keys_callback[key][0]:
                 self.keys_callback[key][0] = False
+
+def prepare_for_fullscreen(image, scale=1.0, background_color=(0, 0, 0),
+                                    fixed=None):
+
+
+    user32 = ctypes.windll.user32
+
+    screen_width = user32.GetSystemMetrics(0)
+    screen_height = user32.GetSystemMetrics(1)
+
+    h, w = image.shape[:2]
+
+    new_width = int(w * scale)
+    new_height = int(h * scale)
+
+    if fixed is not None:
+
+        new_width = fixed[0]
+        new_height = fixed[1]
+
+    image = cv2.resize(
+        image,
+        (new_width, new_height),
+        interpolation=cv2.INTER_NEAREST
+    )
+
+    # Fullscreen canvas
+    canvas = np.full(
+        (screen_height, screen_width, 3),
+        background_color,
+        dtype=np.uint8
+    )
+
+    # Center image
+    x = (screen_width - new_width) // 2
+    y = (screen_height - new_height) // 2
+
+    canvas[y:y + new_height, x:x + new_width] = image
+
+    return canvas
+
+def show_real_image(path, scale=1.0, background_color=(0, 0, 0), fixed=(1024, 1024)):
+    name = constants.CV2_WINDOW_NAME
+
+    user32 = ctypes.windll.user32
+
+    # Remember whatever window currently has focus
+    original_hwnd = user32.GetForegroundWindow()
+
+    image = cv2.imread(path)
+
+    if image is None:
+        raise FileNotFoundError(f"Could not load image: {path}")
+
+    image = prepare_for_fullscreen(image, scale=scale, background_color=background_color, fixed=fixed)
+
+    cv2.namedWindow(name, cv2.WINDOW_NORMAL)
+
+    cv2.setWindowProperty(
+        name,
+        cv2.WND_PROP_FULLSCREEN,
+        cv2.WINDOW_FULLSCREEN
+    )
+
+    cv2.imshow(name, image)
+
+    # Let OpenCV actually create/render the native window
+    cv2.waitKey(1)
+
+    # Find the OpenCV window
+    cv2_hwnd = user32.FindWindowW(None, name)
+
+    if cv2_hwnd:
+        # Make sure it is shown and bring it to the foreground
+        user32.ShowWindow(cv2_hwnd, 5)  # SW_SHOW
+        user32.SetForegroundWindow(cv2_hwnd)
+
+    # Wait for a key
+    cv2.waitKey(0)
+
+    # Close OpenCV window
+    try:
+        cv2.destroyWindow(name)
+        cv2.waitKey(1)
+    except cv2.error:
+        pass
+
+    # Return focus to the original window
+    if original_hwnd:
+        user32.ShowWindow(original_hwnd, 5)  # SW_SHOW
+        user32.SetForegroundWindow(original_hwnd)
 
 
 def wait_for_key(key):
@@ -592,106 +697,288 @@ def show_cursor(context):
     print("\033[?25h", end="")
     context.cursor_visible = True
 
-def page_margin_correction(context):
-    """
 
-    """
 
 def terminal_dimensions(context):
     """
-    Returns the currently visible terminal dimensions.
+    Returns the actual visible terminal dimensions in character cells.
 
-    Returns:
-        (columns, rows)
+    On Windows:
+        Uses srWindow rather than the screen-buffer size, so the result
+        remains correct when Windows Terminal is zoomed.
     """
-    size = shutil.get_terminal_size()
-    return (size.columns,
-            size.lines)
+
+    if hasattr(ctypes, "windll"):
+        kernel32 = ctypes.windll.kernel32
+
+        handle = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
+
+        info = CONSOLE_SCREEN_BUFFER_INFO()
+
+        if kernel32.GetConsoleScreenBufferInfo(handle, ctypes.byref(info)):
+            columns = (
+                info.srWindow.Right
+                - info.srWindow.Left
+                + 1
+            )
+
+            rows = (
+                info.srWindow.Bottom
+                - info.srWindow.Top
+                + 1
+            )
+
+            return columns, rows
+
+    # Fallback for non-Windows terminals
+    size = os.get_terminal_size()
+    return size.columns, size.lines
+
+def visible_width(text):
+    """
+    Return the number of terminal columns occupied by `text`.
+
+    ANSI escape sequences are ignored.
+    """
+    text = ANSI_ESCAPE.sub("", text)
+
+    width = wcswidth(text)
+
+    if width < 0:
+        width = 0
+
+    return width
+
+
+def _split_into_units(text):
+    """
+    Split a line into ANSI sequences, words, and whitespace.
+
+    ANSI sequences are kept as separate zero-width units.
+    """
+    tokens = re.split(f"({ANSI_ESCAPE.pattern})", text)
+
+    units = []
+    current = []
+    current_type = None
+
+    for token in tokens:
+        if not token:
+            continue
+
+        # ANSI sequence
+        if ANSI_ESCAPE.fullmatch(token):
+            current.append(token)
+            continue
+
+        for char in token:
+            if char == "\t":
+                char = " " * 8
+
+            if char.isspace():
+                char_type = "space"
+            else:
+                char_type = "word"
+
+            if current_type is None:
+                current_type = char_type
+
+            elif char_type != current_type:
+                units.append("".join(current))
+                current = []
+                current_type = char_type
+
+            current.append(char)
+
+    if current:
+        units.append("".join(current))
+
+    return units
+
 
 def wrap_text(text, columns):
     """
-    Inserts real '\\n' characters whenever a line reaches `columns`.
+    Wrap text to `columns` terminal cells using word wrapping.
 
-    Existing '\\n' characters are preserved.
-    ANSI escape sequences do not count toward the column width.
+    If a word does not fit on the current line, the entire word
+    is moved to the next line.
+
+    If a single word is longer than `columns`, that word is split.
+
+    Existing newline characters are preserved.
+
+    ANSI escape sequences do not consume terminal columns.
     """
+    if columns <= 0:
+        return text
+
     result = []
 
     for original_line in text.split("\n"):
+
+        units = _split_into_units(original_line)
+
         current = []
         width = 0
 
-        # Separate ANSI escape sequences from normal characters
-        tokens = re.split(f"({ANSI_ESCAPE.pattern})", original_line)
+        i = 0
 
-        for token in tokens:
-            if not token:
+        while i < len(units):
+            unit = units[i]
+
+            # ANSI-only unit.
+            # Just preserve it.
+            if visible_width(unit) == 0 and not unit.strip():
+                current.append(unit)
+                i += 1
                 continue
 
-            # ANSI sequence
-            if ANSI_ESCAPE.fullmatch(token):
-                current.append(token)
-                continue
+            unit_width = visible_width(unit)
 
-            # Normal text
-            for char in token:
-                char_width = wcwidth(char)
+            # Whitespace
+            if unit.isspace():
 
-                if char_width < 0:
-                    char_width = 0
+                # Don't put whitespace at the beginning of a new line.
+                if width == 0:
+                    i += 1
+                    continue
 
-                if width + char_width > columns:
+                # Add whitespace only if it fits.
+                if width + unit_width <= columns:
+                    current.append(unit)
+                    width += unit_width
+
+                else:
                     result.append("".join(current))
                     current = []
                     width = 0
 
-                current.append(char)
-                width += char_width
+                i += 1
+                continue
+
+            # Word fits on the current line.
+            if width + unit_width <= columns:
+                current.append(unit)
+                width += unit_width
+                i += 1
+                continue
+
+            # Word does not fit.
+            # Move the whole word to the next line.
+            if width > 0:
+                result.append("".join(current))
+                current = []
+                width = 0
+
+                # Don't consume the word yet.
+                continue
+
+            # The word itself is longer than the entire line.
+            # Split it character-by-character.
+            tokens = re.split(
+                f"({ANSI_ESCAPE.pattern})",
+                unit
+            )
+
+            for token in tokens:
+                if not token:
+                    continue
+
+                # ANSI sequence
+                if ANSI_ESCAPE.fullmatch(token):
+                    current.append(token)
+                    continue
+
+                for char in token:
+                    char_width = wcwidth(char)
+
+                    if char_width < 0:
+                        char_width = 0
+
+                    if (
+                        char_width > 0
+                        and width + char_width > columns
+                    ):
+                        result.append("".join(current))
+                        current = []
+                        width = 0
+
+                    current.append(char)
+                    width += char_width
+
+            i += 1
 
         result.append("".join(current))
 
     return "\n".join(result)
 
 
+def center_terminal_line(line, columns):
+    """
+    Center a single already-wrapped line within `columns`.
+    """
+    width = visible_width(line)
+
+    if width >= columns:
+        return line
+
+    padding = (columns - width) // 2
+
+    return (" " * padding) + line
+
+
 def paginate_text(context, texts):
     """
-    Takes a list of (text, centered) tuples.
+    Takes a list of (text, centered) tuples and converts them
+    into terminal-sized pages.
 
-    `text`:
-        The text to wrap.
+    Each tuple is:
 
-    `centered`:
-        If True, every resulting line is centered within the
-        current terminal width.
+        (text, centered)
+
+    centered=True centers every resulting visual line.
 
     Returns:
-        A list of page strings.
+        list[str]
     """
     columns, rows = terminal_dimensions(context)
-    columns = int(columns * constants.PAGE_CORRECTION_FACTOR_WIDTH)
-    rows = int(rows * constants.PAGE_CORRECTION_FACTOR_HEIGHT)
+
+    if (context.current_zoom >= 0):
+        columns = int(columns * constants.PAGE_CORRECTION_FACTOR_WIDTH_ZOOM_IN)
+        rows = int(rows * constants.PAGE_CORRECTION_FACTOR_HEIGHT_ZOOM_IN)
+    else:
+        columns = int(columns * constants.PAGE_CORRECTION_FACTOR_WIDTH_ZOOM_OUT)
+        rows = int(rows * constants.PAGE_CORRECTION_FACTOR_HEIGHT_ZOOM_OUT)
+
+    columns = max(1, columns)
+    rows = max(1, rows)
 
     all_lines = []
 
     for text, centered in texts:
-        # Wrap the text first
+
         wrapped = wrap_text(text, columns)
 
         for line in wrapped.split("\n"):
+
             if centered:
-                # Calculate visible width, ignoring ANSI escape sequences
-                width = visible_length(line)
-
-                padding = max(0, (columns - width) // 2)
-
-                line = " " * padding + line
+                line = center_terminal_line(
+                    line,
+                    columns
+                )
 
             all_lines.append(line)
 
-    return [
-        "\n".join(all_lines[i:i + rows])
-        for i in range(0, len(all_lines), rows)
-    ]
+    pages = []
+
+    for start in range(0, len(all_lines), rows):
+        page_lines = all_lines[start:start + rows]
+        pages.append("\n".join(page_lines))
+
+    if not pages:
+        pages.append("")
+
+    return pages
 """
 ascii fonts
 """

@@ -241,12 +241,12 @@ def pagetest(local_object):
             """
 
 
-    full_text = [(text_c, True), (text, False)]
+    full_text = [(text_c, True), (text, True)]
     pages = terminal.paginate_text(local_object.context, full_text)
 
     with NewPage():
         print(pages[0])
-        print(len(pages))
+        #print(len(pages))
 
 
 

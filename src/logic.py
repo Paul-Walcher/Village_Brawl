@@ -18,8 +18,33 @@ import states
 from states import Gamestates
 import playset_loader
 import phases
+import cv2
 
 KEY_RELEASE_BUFEER = 0.5
+
+class Stack:
+
+    def __init__(self):
+
+        self.stack = []
+
+    def size(self):
+        return len(self.stack)
+
+    def top(self):
+
+        if self.size() > 0:
+            return self.stack[-1]
+        else:
+            return None
+
+    def push(self, obj):
+
+        self.stack.append(obj)
+
+    def pop(self):
+        return self.stack.pop()
+
 
 class Zoomrestore:
 
@@ -513,11 +538,16 @@ def choose_explorer(gamestatehandler):
             self.show_info = False
             self.quit = False
 
+            #img_handle
+            self.img_handle = None
+
             #states
             self.explorer_preview = 0
             self.explorer_hd = 1
 
             self.current_state = self.explorer_preview
+
+            self.zoom = 20
 
 
 
@@ -533,14 +563,17 @@ def choose_explorer(gamestatehandler):
     def enter_pressed(key, local_object):
         local_object.quit = True
 
+    def real_image_pressed(key, local_object):
+
+        terminal.show_real_image(constants.STANDARD_IMAGE_PATH + "\\" + "Twig.png")
+
     def ultra_hd_key_pressed(key, local_object):
 
         context = local_object.context
 
-        terminal.zoom_to(context, 0)
 
         if local_object.current_state == local_object.explorer_preview:
-            terminal.zoom_to(context, 20)
+            terminal.zoom_to(context, local_object.zoom)
             graphics.print_ultra_hd_explorer(local_object)
             local_object.current_state = local_object.explorer_hd
         elif local_object.current_state == local_object.explorer_hd:
@@ -548,9 +581,25 @@ def choose_explorer(gamestatehandler):
             graphics.print_explorer(local_object)
             local_object.current_state = local_object.explorer_preview
 
+    def zoom_in_key(key, local_object):
+        local_object.zoom += 1
+        if local_object.current_state == local_object.explorer_hd:
+            terminal.zoom_to(context, local_object.zoom)
+            graphics.print_ultra_hd_explorer(local_object)
+
+
+    def zoom_out_key(key, local_object):
+        local_object.zoom -= 1
+        if local_object.current_state == local_object.explorer_hd:
+            terminal.zoom_to(context, local_object.zoom)
+            graphics.print_ultra_hd_explorer(local_object)
+
     keycallback = terminal.KeyCallback()
     keycallback.register_key("enter", enter_pressed)
+    keycallback.register_key("w", zoom_in_key)
+    keycallback.register_key("s", zoom_out_key)
     keycallback.register_key(context.settings.ultra_hd_image_key, ultra_hd_key_pressed)
+    keycallback.register_key(context.settings.real_image_key, real_image_pressed)
 
     while not local_object.quit:
 

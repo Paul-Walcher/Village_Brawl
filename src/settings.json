@@ -11,5 +11,6 @@
   "HD": 250,
   "Ultra_HD": 480,
 
-  "ultra_hd_image_key": "alt"
+  "ultra_hd_image_key": "alt",
+  "real_image_key": "#"
 }

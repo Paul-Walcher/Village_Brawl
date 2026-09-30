@@ -31,6 +31,7 @@ def read_settings(global_context: Global_Context):
             local_context.settings.Ultra_HD = data["Ultra_HD"]
             local_context.settings.ascii_art = data["ascii_art"]
             local_context.settings.hd_image_key = data["ultra_hd_image_key"]
+            local_context.settings.real_image_key = data["real_image_key"]
 
     except Exception as e:
 
