@@ -9,7 +9,7 @@
   "high_res": 125,
   "very_high_res": 150,
   "HD": 250,
-  "Ultra_HD": 480,
+  "Ultra_HD": 550,
 
   "ultra_hd_image_key": "alt",
   "real_image_key": "#"

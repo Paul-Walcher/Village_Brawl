@@ -50,6 +50,9 @@ VK_UP = 0x26
 VK_DOWN = 0x28
 VK_PRIOR = 0x21      # Page Up
 VK_NEXT = 0x22       # Page Down
+VK_0 = 0x30
+VK_ADD = 0x6B
+VK_SUBTRACT = 0x6D
 
 VK_L = 0x4C
 
@@ -466,9 +469,29 @@ def terminal_is_maximized():
         rect.bottom == screen_height
     )
 
+def wait_for_terminal_change(old_dimensions, timeout=0.5, poll_interval=0.01):
+    deadline = time.perf_counter() + timeout
+
+    while time.perf_counter() < deadline:
+        new_dimensions = terminal_dimensions()
+
+        if new_dimensions != old_dimensions:
+            return new_dimensions
+
+        time.sleep(poll_interval)
+
+    return terminal_dimensions()
+
 def press_key(vk):
     user32.keybd_event(vk, 0, 0, 0)
     user32.keybd_event(vk, 0, KEYEVENTF_KEYUP, 0)
+
+def press_ctrl_key(vk, delay=0.05):
+    user32.keybd_event(VK_CONTROL, 0, 0, 0)
+    press_key(vk)
+    user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
+
+    time.sleep(delay)
 
 def zoom_in_no_context(n, buffer_time=BUFFER_TIME):
     for i in range(n):
@@ -489,17 +512,6 @@ def reset_zoom_no_context():
     context.current_zoom = 0
     time.sleep(0.1)
 
-
-
-def zoom_in(context, n, buffer_time=BUFFER_TIME):
-    for i in range(n):
-        user32.keybd_event(VK_CONTROL, 0, 0, 0)
-        press_key(VK_ADD)
-        user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
-        time.sleep(buffer_time)
-
-    context.current_zoom += n
-
 def zoom_to_no_context(prev_zoom, zoom, buffer_t=0.01):
 
     diff = zoom - prev_zoom
@@ -509,31 +521,51 @@ def zoom_to_no_context(prev_zoom, zoom, buffer_t=0.01):
     if (diff < 0):
         zoom_out_no_context(abs(diff), buffer_time=buffer_t)
 
+def press_zoom_key(key, hold_time=0.02, after_time=0.15):
+    keyboard.press("ctrl")
+    time.sleep(hold_time)
 
-def zoom_out(context, n, buffer_time=BUFFER_TIME):
-    for i in range(n):
-        user32.keybd_event(VK_CONTROL, 0, 0, 0)
-        press_key(VK_SUBTRACT)
-        user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
-        time.sleep(buffer_time)
+    keyboard.press(key)
+    time.sleep(hold_time)
+
+    keyboard.release(key)
+    time.sleep(hold_time)
+
+    keyboard.release("ctrl")
+    time.sleep(after_time)
+
+
+def zoom_in(context, n, buffer_time=0.15):
+    for _ in range(n):
+        press_zoom_key("+", after_time=buffer_time)
+
+    context.current_zoom += n
+
+
+def zoom_out(context, n, buffer_time=0.15):
+    for _ in range(n):
+        press_zoom_key("-", after_time=buffer_time)
 
     context.current_zoom -= n
 
-
-def reset_zoom(context):
+def reset_zoom(context, buffer_time=0.5):
     keyboard.press_and_release("ctrl+0")
+    time.sleep(buffer_time)
+
     context.current_zoom = 0
-    time.sleep(0.1)
 
-def zoom_to(context, zoom, buffer_t=0.01):
 
-    reset_zoom(context)
+def zoom_to(context, zoom, buffer_time=0.05):
 
-    if (zoom > 0):
-        zoom_in(context, zoom, buffer_time=buffer_t)
-    if (zoom < 0):
-        zoom_out(context, abs(zoom), buffer_time=buffer_t)
+    #reset_zoom(context)
 
+    zoom = zoom - context.current_zoom
+
+    if zoom > 0:
+        zoom_in(context, zoom, buffer_time)
+
+    elif zoom < 0:
+        zoom_out(context, -zoom, buffer_time)
 
 def key_down(vk):
     user32.keybd_event(vk, 0, 0, 0)
@@ -699,40 +731,18 @@ def show_cursor(context):
 
 
 
-def terminal_dimensions(context):
-    """
-    Returns the actual visible terminal dimensions in character cells.
+def terminal_dimensions():
+    handle = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
 
-    On Windows:
-        Uses srWindow rather than the screen-buffer size, so the result
-        remains correct when Windows Terminal is zoomed.
-    """
+    info = CONSOLE_SCREEN_BUFFER_INFO()
 
-    if hasattr(ctypes, "windll"):
-        kernel32 = ctypes.windll.kernel32
+    if not kernel32.GetConsoleScreenBufferInfo(handle, ctypes.byref(info)):
+        return None, None
 
-        handle = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
+    columns = info.srWindow.Right - info.srWindow.Left + 1
+    rows = info.srWindow.Bottom - info.srWindow.Top + 1
 
-        info = CONSOLE_SCREEN_BUFFER_INFO()
-
-        if kernel32.GetConsoleScreenBufferInfo(handle, ctypes.byref(info)):
-            columns = (
-                info.srWindow.Right
-                - info.srWindow.Left
-                + 1
-            )
-
-            rows = (
-                info.srWindow.Bottom
-                - info.srWindow.Top
-                + 1
-            )
-
-            return columns, rows
-
-    # Fallback for non-Windows terminals
-    size = os.get_terminal_size()
-    return size.columns, size.lines
+    return columns, rows
 
 def visible_width(text):
     """
@@ -941,14 +951,7 @@ def paginate_text(context, texts):
     Returns:
         list[str]
     """
-    columns, rows = terminal_dimensions(context)
-
-    if (context.current_zoom >= 0):
-        columns = int(columns * constants.PAGE_CORRECTION_FACTOR_WIDTH_ZOOM_IN)
-        rows = int(rows * constants.PAGE_CORRECTION_FACTOR_HEIGHT_ZOOM_IN)
-    else:
-        columns = int(columns * constants.PAGE_CORRECTION_FACTOR_WIDTH_ZOOM_OUT)
-        rows = int(rows * constants.PAGE_CORRECTION_FACTOR_HEIGHT_ZOOM_OUT)
+    columns, rows = terminal_dimensions()
 
     columns = max(1, columns)
     rows = max(1, rows)
