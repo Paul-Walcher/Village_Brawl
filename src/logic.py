@@ -19,6 +19,7 @@ from states import Gamestates
 import playset_loader
 import phases
 import cv2
+from states import SplitscreenState
 
 KEY_RELEASE_BUFEER = 0.5
 
@@ -515,6 +516,53 @@ def load_playset(gamestatehandler):
 
     gamestatehandler.state_stack.push(states.Gamestates.CHOOSE_EXPLORER)
 
+def explorer_info(gamestatehandler, explorer_enum):
+
+    context = gamestatehandler.context
+    explorer_ref = context.modules.explorer_mappings[explorer_enum]
+
+    terminal.clear()
+    time.sleep(0.2)
+
+    class LocalObject:
+        def __init__(self):
+
+            self.num_pages = None
+            self.pages = None
+            self.page_index = 0
+            self.context = None
+            self.explorer_enum = None
+            self.explorer_ref = None
+            self.handle = None
+            self.quit = False
+
+    local_object = LocalObject()
+    local_object.context = context
+    local_object.explorer_enum = explorer_enum
+    local_object.explorer_ref = explorer_ref
+
+    handle = terminal.split_horizontally(context, "explorer_info_menu.py")
+    local_object.handle = handle
+    terminal.focus_prev(context)
+
+    context.splitscreen_state = SplitscreenState.SPLIT_HORIZONTALLY
+
+    graphics.print_explorer_with_description(local_object)
+
+    def enter_pressed(key, local_object):
+        local_object.quit = True
+        terminal.close(local_object.context, local_object.handle)
+        context.splitscreen_state = SplitscreenState.NORMAL
+
+    keycallback = terminal.KeyCallback()
+    keycallback.register_key("enter", enter_pressed)
+
+    while not local_object.quit:
+
+        keycallback.check_presses(local_object)
+
+    time.sleep(0.2)
+
 def choose_explorer(gamestatehandler):
 
     gamestatehandler.state_stack.pop()
@@ -603,6 +651,18 @@ def choose_explorer(gamestatehandler):
 
         print_explorer_image(local_object)
 
+    def show_info_pressed(key, local_object):
+
+        explorer_info(local_object.gamestatehandler,
+                    local_object.explorers[local_object.explorer_index])
+
+
+        print_explorer_image(local_object)
+
+
+
+
+
 
     keycallback = terminal.KeyCallback()
     keycallback.register_key("enter", enter_pressed)
@@ -610,6 +670,7 @@ def choose_explorer(gamestatehandler):
     keycallback.register_key(context.settings.real_image_key, real_image_pressed)
     keycallback.register_key("a", a_pressed)
     keycallback.register_key("d", d_pressed)
+    keycallback.register_key(context.settings.info_key, show_info_pressed)
 
 
     while not local_object.quit:

@@ -32,6 +32,7 @@ class Basic_Explorer(Explorer_Template):
         self.inventory_size = 10.0
 
         self.starting_items = {}
+        self.starting_supporters = {}
         self.starting_cards = {}
         self.starting_packs = {}
 

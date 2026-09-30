@@ -20,3 +20,8 @@ class Gamestates(Enum):
 
     FINISH = auto()
     EXIT = auto()
+
+class SplitscreenState(Enum):
+
+    NORMAL = auto()
+    SPLIT_HORIZONTALLY = auto()

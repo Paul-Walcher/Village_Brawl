@@ -4,7 +4,7 @@
   "full_color": false,
   "ascii_art": true,
 
-  "low_res": 50,
+  "low_res": 75,
   "mid_res": 100,
   "high_res": 125,
   "very_high_res": 150,
@@ -12,5 +12,6 @@
   "Ultra_HD": 550,
 
   "ultra_hd_image_key": "alt",
-  "real_image_key": "#"
+  "real_image_key": "#",
+  "info_key": "i"
 }

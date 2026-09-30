@@ -41,7 +41,7 @@ class NewPage:
         return False
 
 
-def box(text, margin=2):
+def boxed(text, margin=2):
 
     """
     Puts a box of | around the text.
@@ -272,3 +272,49 @@ def print_explorer(local_object):
         terminal.print_centered(image_rendered)
 
         terminal.print_centered(bottom_text_rendered)
+
+def print_explorer_with_description(local_object):
+
+    context = local_object.context
+    explorer_enum = local_object.explorer_enum
+    explorer_ref = context.modules.explorer_mappings[explorer_enum]
+
+    name = explorer_ref.name
+    name_color = explorer_ref.name_color
+    image = explorer_ref.standard_image_path
+    description = explorer_ref.description
+
+
+    if local_object.pages is None:
+
+        name = name.splitlines()
+        name = [x.split(" ") for x in name]
+
+        h = []
+
+        for L in name:
+            for g in L:
+                h.append(g)
+
+        name_rendered = [(terminal.render_text("big", x), True) for x in h]
+
+        resolution = context.settings.low_res
+        image_rendered = terminal.image_to_ascii_from_context(image, resolution, context, width_ratio=3.0)
+
+        bottom_text_rendered = description
+
+        full_text = [(terminal.text_rgb_string(*explorer_ref.name_color), False), *name_rendered, (terminal.color_reset_string(), False), ("\n" * 2, False),  (image_rendered, True),
+                    ("\n"*3, False), (bottom_text_rendered, False), ("E"*1000, False)]
+
+        pages = terminal.paginate_text(context, full_text)
+
+        local_object.num_pages = len(pages)
+        local_object.pages = pages
+
+    text_to_print = local_object.pages[local_object.page_index]
+
+
+
+    with NewPage():
+
+        print(text_to_print)

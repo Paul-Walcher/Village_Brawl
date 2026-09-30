@@ -28,6 +28,7 @@ import global_context
 import keyboard
 import constants
 from logic import Stack
+from states import SplitscreenState
 
 import multiprocessing
 import queue
@@ -250,21 +251,21 @@ def split_horizontally(context, script, args=None):
     if args is None:
         args = []
     stop_script_file = str(TERMINAL_ID) + ".txt"
-    stop_script = os.path.join("terminal_subfiles", stop_script_file)
+    stop_script = stop_script_file
 
     subprocess.Popen([
         "wt",
         "-w", "0",
         "split-pane",
         "-V",
-        "-d", constants.SCRIPT_DIR(),
+        "-d", constants.SPLIT_TERMINAL_FILEPATH,
         "python",
         script,
         stop_script,
         *args
     ])
 
-    context.terminal_handles[TERMINAL_ID] = stop_script
+    context.terminal_handles[TERMINAL_ID] = os.path.join(constants.SPLIT_TERMINAL_FILEPATH, stop_script)
     handle = TERMINAL_ID
     TERMINAL_ID += 1
 
@@ -274,8 +275,15 @@ def close(context, handle):
 
     stop_script = context.terminal_handles[handle]
 
-    with open(stop_script, "w"):
-        pass
+    opened = False
+    
+    while not opened:
+        try:
+            with open(stop_script, "w"):
+                pass
+            opened = True
+        except:
+            pass
 
     del context.terminal_handles[handle]
 
@@ -363,7 +371,7 @@ def image_to_background_ascii(
     saturation=1.8,
     contrast=1.6,
     brightness=0.9,
-    black_threshold=50,
+    black_threshold=10,
 ):
     art = ascii_magic.from_image(path)
 
@@ -950,6 +958,10 @@ def paginate_text(context, texts):
 
     columns = max(1, columns)
     rows = max(1, rows)
+
+    if context.splitscreen_state == SplitscreenState.SPLIT_HORIZONTALLY:
+
+        columns = columns // 2
 
     all_lines = []
 

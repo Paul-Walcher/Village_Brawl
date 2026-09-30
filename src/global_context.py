@@ -7,6 +7,7 @@ import playset_loader
 import cv2
 import constants
 import terminal_functions as terminal
+from states import SplitscreenState
 
 class Settings:
 
@@ -26,6 +27,7 @@ class Settings:
 
         self.ultra_hd_image_key = "alt"
         self.real_image_key = "#"
+        self.info_key = "i"
 
     def copy(self):
 
@@ -42,6 +44,7 @@ class Settings:
         settings_copy.ascii_art = self.ascii_art
         settings_copy.ultra_hd_image_key = self.ultra_hd_image_key
         settings_copy.real_image_key = self.real_image_key
+        settings_copy.info_key = self.info_key
 
         return settings_copy
 
@@ -116,7 +119,7 @@ class Global_Context:
         self.cursor_visible = True
         self.terminal_handles = {} #handels for terminals
         self.misc = {} # Miscellaneous
-
+        self.splitscreen_state = SplitscreenState.NORMAL
 
     def copy(self):
 
@@ -136,5 +139,6 @@ class Global_Context:
         context_copy.cursor_visible = self.cursor_visible
         context_copy.terminal_handles = self.terminal_handles #intentional reference copy
         context_copy.misc = self.misc
+        context_copy.splitscreen_state = self.splitscreen_state
 
         return context_copy

@@ -24,3 +24,5 @@ VALID_SYMBOLS = [chr(x) for x in range(97, 97+26)] + [chr(x) for x in range(48, 
 
 #color_reset_string
 CYAN = (43,220,221)
+
+SPLIT_TERMINAL_FILEPATH = os.path.join(SCRIPT_DIR(), "terminal_subfiles")
