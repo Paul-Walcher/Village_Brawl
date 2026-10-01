@@ -130,8 +130,8 @@ def finish(gamestatehandler):
     terminal.enable_scrollback()
 
     #cleaning up all open terminals
-    for handle in context.terminal_handles:
-        terminal.close(context, handle)
+    for handle in terminal.HANDLES:
+        terminal.close(handle)
         time.sleep(0.1)
 
     #clear text
@@ -240,7 +240,7 @@ def new_game_or_save_selection(gamestatehandler):
                 if not context.misc["RUNNING"]:
                     args = [os.path.join(constants.STANDARD_IMAGE_PATH, "Wood.png"), str(context.settings.mid_res),
                             str(int(context.settings.full_color)), str(int(context.settings.monochrome_assets))]
-                    context.misc["HANDLE"] = terminal.split_horizontally(context, "split_terminal_files/draw_image.py", args)
+                    context.misc["HANDLE"] = terminal.split_horizontally("split_terminal_files/draw_image.py", args)
                     context.misc["RUNNING"] = True
 
                     time.sleep(0.3)
@@ -249,7 +249,7 @@ def new_game_or_save_selection(gamestatehandler):
                     graphics.print_new_game_or_save_selection(context, selection_state)
 
                 else:
-                    terminal.close(context, context.misc["HANDLE"])
+                    terminal.close(context.misc["HANDLE"])
                     time.sleep(0.1)
                     terminal.focus_prev(context)
                     context.misc["RUNNING"] = False
@@ -543,9 +543,11 @@ def explorer_info(gamestatehandler, explorer_enum):
     local_object.explorer_enum = explorer_enum
     local_object.explorer_ref = explorer_ref
 
-    handle = terminal.split_horizontally(context, "explorer_info_menu.py")
+    handle = terminal.split_horizontally("explorer_info_menu.py")
     local_object.handle = handle
     terminal.focus_prev(context)
+
+    terminal.send_over(handle, "ASNABHZGASZSAHUJ")
 
     context.splitscreen_state = SplitscreenState.SPLIT_HORIZONTALLY
 
@@ -554,7 +556,7 @@ def explorer_info(gamestatehandler, explorer_enum):
 
     def enter_pressed(key, local_object):
         local_object.quit = True
-        terminal.close(local_object.context, local_object.handle)
+        terminal.close(local_object.handle)
         context.splitscreen_state = SplitscreenState.NORMAL
 
     def switch_focus(key, local_object):
@@ -572,6 +574,7 @@ def explorer_info(gamestatehandler, explorer_enum):
             local_object.page_index %= local_object.num_pages
 
             graphics.print_explorer_with_description(local_object)
+
 
     def prev_page(key, local_object):
 

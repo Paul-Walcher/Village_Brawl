@@ -61,6 +61,7 @@ BUFFER_TIME = 0.01
 FIRST_PRINTED_LINE = None
 
 TERMINAL_ID = 1
+HANDLES = {}
 
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
@@ -244,16 +245,31 @@ def clear_keyboard_buffer():
     handle = kernel32.GetStdHandle(-10)  # STD_INPUT_HANDLE
     kernel32.FlushConsoleInputBuffer(handle)
 
-def split_horizontally(context, script, args=None):
+def clear_terminal_subfolder():
+
+    folder = constants.SPLIT_TERMINAL_FILEPATH
+    files = os.listdir(folder)
+
+    for file in files:
+
+        if file.endswith(".txt"):
+            os.remove(os.path.join(constants.SPLIT_TERMINAL_FILEPATH, file))
+
+def split_horizontally(script, args=None):
     """
     Will be executed from this folders parentfolder
     """
     global TERMINAL_ID
+    global HANDLES
 
     if args is None:
         args = []
     stop_script_file = str(TERMINAL_ID) + ".txt"
     stop_script = stop_script_file
+    data_transmission_file = str(TERMINAL_ID) + "data.txt"
+
+    with open(os.path.join(constants.SPLIT_TERMINAL_FILEPATH, data_transmission_file), "w") as f:
+        pass
 
     subprocess.Popen([
         "wt",
@@ -264,19 +280,46 @@ def split_horizontally(context, script, args=None):
         "python",
         script,
         stop_script,
+        data_transmission_file,
         *args
     ])
 
-    context.terminal_handles[TERMINAL_ID] = os.path.join(constants.SPLIT_TERMINAL_FILEPATH, stop_script)
+    HANDLES[TERMINAL_ID] = [
+                    os.path.join(constants.SPLIT_TERMINAL_FILEPATH, stop_script),
+                    os.path.join(constants.SPLIT_TERMINAL_FILEPATH, data_transmission_file)
+                    ]
+
     handle = TERMINAL_ID
     TERMINAL_ID += 1
 
     return handle
 
-def close(context, handle):
+def send_over(handle, text):
 
-    stop_script = context.terminal_handles[handle]
+    global HANDLES
 
+    ref = HANDLES[handle]
+    stop_script = ref[0]
+    data_transmission_file = ref[1]
+
+    opened = False
+
+    while not opened:
+        try:
+            with open(data_transmission_file, "a") as f:
+                f.write(text)
+                f.write("\n")
+            opened = True
+        except:
+            pass
+
+def close(handle):
+
+    global HANDLES
+
+    ref = HANDLES[handle]
+    stop_script = ref[0]
+    data_transmission_file = ref[1]
     opened = False
 
     while not opened:
@@ -286,8 +329,8 @@ def close(context, handle):
             opened = True
         except:
             pass
-
-    del context.terminal_handles[handle]
+#
+    del HANDLES[handle]
 
 def focus_prev(context):
     subprocess.run([

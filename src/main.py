@@ -19,6 +19,9 @@ if not terminal.terminal_is_maximized():
 if not constants.__DEBUG__:
     terminal.disable_scrollback()
 
+#clearing terminal folder
+terminal.clear_terminal_subfolder()
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 handler = GamestateHandler()
