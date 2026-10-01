@@ -231,6 +231,8 @@ def show_real_image(path, scale=1.0, background_color=(0, 0, 0), fixed=(1024, 10
         user32.ShowWindow(original_hwnd, 5)  # SW_SHOW
         user32.SetForegroundWindow(original_hwnd)
 
+    time.sleep(0.4)
+
 
 def wait_for_key(key):
     #waiting function
@@ -276,7 +278,7 @@ def close(context, handle):
     stop_script = context.terminal_handles[handle]
 
     opened = False
-    
+
     while not opened:
         try:
             with open(stop_script, "w"):
@@ -940,7 +942,7 @@ def center_terminal_line(line, columns):
     return (" " * padding) + line
 
 
-def paginate_text(context, texts):
+def paginate_text(context, texts, bottom_margin=0):
     """
     Takes a list of (text, centered) tuples and converts them
     into terminal-sized pages.
@@ -961,7 +963,10 @@ def paginate_text(context, texts):
 
     if context.splitscreen_state == SplitscreenState.SPLIT_HORIZONTALLY:
 
-        columns = columns // 2
+        columns = columns // 2 - 2
+
+    if (bottom_margin > 0 and bottom_margin < rows):
+        rows -= bottom_margin
 
     all_lines = []
 

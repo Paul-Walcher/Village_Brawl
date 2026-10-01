@@ -28,6 +28,7 @@ class Settings:
         self.ultra_hd_image_key = "alt"
         self.real_image_key = "#"
         self.info_key = "i"
+        self.enter_alternative_key = "o"
 
     def copy(self):
 
@@ -45,6 +46,7 @@ class Settings:
         settings_copy.ultra_hd_image_key = self.ultra_hd_image_key
         settings_copy.real_image_key = self.real_image_key
         settings_copy.info_key = self.info_key
+        settings_copy.enter_alternative_key = self.enter_alternative_key
 
         return settings_copy
 

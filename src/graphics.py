@@ -296,25 +296,37 @@ def print_explorer_with_description(local_object):
             for g in L:
                 h.append(g)
 
-        name_rendered = [(terminal.render_text("big", x), True) for x in h]
+        name_rendered = [(terminal.render_text("js_block_letters", x), True) for x in h]
 
         resolution = context.settings.low_res
         image_rendered = terminal.image_to_ascii_from_context(image, resolution, context, width_ratio=3.0)
 
+
         bottom_text_rendered = description
 
-        full_text = [(terminal.text_rgb_string(*explorer_ref.name_color), False), *name_rendered, (terminal.color_reset_string(), False), ("\n" * 2, False),  (image_rendered, True),
-                    ("\n"*3, False), (bottom_text_rendered, False), ("E"*1000, False)]
+        lives_text = terminal.text_rgb_string(255, 0, 0) + "Lives: " +  str(explorer_ref.lives) + terminal.color_reset_string()
+        inventory_size_text = terminal.text_rgb_string(102, 102, 255) + "Inventory Size: " + str(explorer_ref.inventory_size) + terminal.color_reset_string()
 
-        pages = terminal.paginate_text(context, full_text)
+        full_text = [(terminal.text_rgb_string(*explorer_ref.name_color), False), *name_rendered, (terminal.color_reset_string(), False), ("\n" * 2, False),  (image_rendered, True),
+                    ("\n"*2, False),
+                    (lives_text, False), (inventory_size_text, False), ("\n"*2, False),
+                    (bottom_text_rendered, False), ("E"*10000, False)]
+
+        pages = terminal.paginate_text(context, full_text,  bottom_margin=4)
 
         local_object.num_pages = len(pages)
         local_object.pages = pages
 
     text_to_print = local_object.pages[local_object.page_index]
 
+    distance = "\n"*2
+    bottom_string = str(local_object.page_index + 1) + "/" + str(local_object.num_pages)
+
+    terminal.clear()
 
 
     with NewPage():
 
         print(text_to_print)
+        print(distance)
+        terminal.print_centered(bottom_string)

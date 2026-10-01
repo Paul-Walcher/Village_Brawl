@@ -4,7 +4,7 @@ Explorer definitions
 import os
 
 from templates.explorer_template import Explorer_Template
-
+import terminal_functions as terminal
 
 
 
@@ -20,7 +20,7 @@ class Basic_Explorer(Explorer_Template):
 
         self.name = "Basic Explorer"
         self.name_color = (255, 144, 0)
-        self.description = "Basic Explorer. Has no special abilities."
+        self.description = terminal.text_rgb_string(0, 204, 0) + "Basic Explorer. Has no special abilities." + terminal.color_reset_string()
 
         self.ability_name = "-"
         self.ability_activation_phases = []

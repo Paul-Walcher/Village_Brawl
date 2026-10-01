@@ -522,7 +522,7 @@ def explorer_info(gamestatehandler, explorer_enum):
     explorer_ref = context.modules.explorer_mappings[explorer_enum]
 
     terminal.clear()
-    time.sleep(0.2)
+    time.sleep(0.1)
 
     class LocalObject:
         def __init__(self):
@@ -535,6 +535,8 @@ def explorer_info(gamestatehandler, explorer_enum):
             self.explorer_ref = None
             self.handle = None
             self.quit = False
+
+            self.left_focused = True
 
     local_object = LocalObject()
     local_object.context = context
@@ -549,13 +551,47 @@ def explorer_info(gamestatehandler, explorer_enum):
 
     graphics.print_explorer_with_description(local_object)
 
+
     def enter_pressed(key, local_object):
         local_object.quit = True
         terminal.close(local_object.context, local_object.handle)
         context.splitscreen_state = SplitscreenState.NORMAL
 
+    def switch_focus(key, local_object):
+        local_object.left_focused = not local_object.left_focused
+
+        if local_object.left_focused:
+            terminal.focus_prev(local_object.context)
+        else:
+            terminal.focus_next(local_object.context)
+
+    def next_page(key, local_object):
+
+        if local_object.left_focused:
+            local_object.page_index += 1
+            local_object.page_index %= local_object.num_pages
+
+            graphics.print_explorer_with_description(local_object)
+
+    def prev_page(key, local_object):
+
+        if local_object.left_focused:
+
+            local_object.page_index -= 1
+            local_object.page_index %= local_object.num_pages
+
+            graphics.print_explorer_with_description(local_object)
+
+
+
+
     keycallback = terminal.KeyCallback()
     keycallback.register_key("enter", enter_pressed)
+    keycallback.register_key(context.settings.enter_alternative_key, enter_pressed)
+    keycallback.register_key("w", switch_focus)
+    keycallback.register_key("s", switch_focus)
+    keycallback.register_key("a", prev_page)
+    keycallback.register_key("d", next_page)
 
     while not local_object.quit:
 
@@ -666,6 +702,7 @@ def choose_explorer(gamestatehandler):
 
     keycallback = terminal.KeyCallback()
     keycallback.register_key("enter", enter_pressed)
+    keycallback.register_key(context.settings.enter_alternative_key, enter_pressed)
     keycallback.register_key(context.settings.ultra_hd_image_key, toggle_explorer_hd_and_print)
     keycallback.register_key(context.settings.real_image_key, real_image_pressed)
     keycallback.register_key("a", a_pressed)
