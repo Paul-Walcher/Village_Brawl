@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import terminal_functions as terminal
+import graphics
 import constants
 import time
 import os
@@ -18,6 +19,9 @@ if __name__ == "__main__":
 
     transmitted_data = []
 
+    terminal.hide_cursor_no_context()
+    terminal.clear()
+
     while 1:
 
         data = []
@@ -28,15 +32,33 @@ if __name__ == "__main__":
         try:
 
             with open(data_transmission_filename, "r") as f:
-                data = f.read().splitlines()
+                data = f.read()
             with open(data_transmission_filename, "w"):
                 pass
+
+            time.sleep(0.1)
 
         except:
             pass
 
         if data:
-            print(data[0])
+
+            text = ""
+
+            lines = data.splitlines()
+
+            for line in lines:
+
+                codec_res = terminal.process_codec(line)
+                line_text = codec_res[0]
+                func = codec_res[1]
+
+                text += line_text + "\n"
+                func()
+
+
+            with graphics.NewPage():
+                print(text)
 
 
     removed = False

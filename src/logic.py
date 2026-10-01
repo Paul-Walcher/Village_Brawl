@@ -536,6 +536,10 @@ def explorer_info(gamestatehandler, explorer_enum):
             self.handle = None
             self.quit = False
 
+            self.menu_zoom = 0
+            self.menu_zoom_diff = 0
+            self.menu_highlighted_index = 0
+
             self.left_focused = True
 
     local_object = LocalObject()
@@ -543,15 +547,19 @@ def explorer_info(gamestatehandler, explorer_enum):
     local_object.explorer_enum = explorer_enum
     local_object.explorer_ref = explorer_ref
 
-    handle = terminal.split_horizontally("explorer_info_menu.py")
+    handle = terminal.split_horizontally("print.py")
     local_object.handle = handle
-    terminal.focus_prev(context)
-
-    terminal.send_over(handle, "ASNABHZGASZSAHUJ")
-
     context.splitscreen_state = SplitscreenState.SPLIT_HORIZONTALLY
 
+    terminal.focus_prev(context)
     graphics.print_explorer_with_description(local_object)
+
+    terminal.focus_next(context)
+    menu_text = graphics.render_explorer_info_menu(local_object)
+    terminal.send_over(handle, menu_text)
+    time.sleep(terminal.ZOOM_TIME_SLEEP * local_object.menu_zoom)
+    terminal.focus_prev(context)
+
 
 
     def enter_pressed(key, local_object):
@@ -560,14 +568,26 @@ def explorer_info(gamestatehandler, explorer_enum):
         context.splitscreen_state = SplitscreenState.NORMAL
 
     def switch_focus(key, local_object):
+
         local_object.left_focused = not local_object.left_focused
 
-        if local_object.left_focused:
-            terminal.focus_prev(local_object.context)
+        if not local_object.left_focused:
+
+            terminal.focus_next(context)
+            menu_text = graphics.render_explorer_info_menu(local_object)
+            terminal.send_over(handle, menu_text)
+            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+            terminal.focus_prev(context)
         else:
             terminal.focus_next(local_object.context)
+            menu_text = graphics.render_explorer_info_menu(local_object)
+            terminal.send_over(handle, menu_text)
+            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+
 
     def next_page(key, local_object):
+
+        context = local_object.context
 
         if local_object.left_focused:
             local_object.page_index += 1
@@ -575,8 +595,23 @@ def explorer_info(gamestatehandler, explorer_enum):
 
             graphics.print_explorer_with_description(local_object)
 
+            terminal.focus_next(context)
+            menu_text = graphics.render_explorer_info_menu(local_object)
+            terminal.send_over(handle, menu_text)
+            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+            terminal.focus_prev(context)
+
+        else:
+
+            local_object.menu_highlighted_index += 1
+            menu_text = graphics.render_explorer_info_menu(local_object)
+            terminal.send_over(handle, menu_text)
+            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+
 
     def prev_page(key, local_object):
+
+        context = local_object.context
 
         if local_object.left_focused:
 
@@ -585,16 +620,28 @@ def explorer_info(gamestatehandler, explorer_enum):
 
             graphics.print_explorer_with_description(local_object)
 
+            terminal.focus_next(context)
+            menu_text = graphics.render_explorer_info_menu(local_object)
+            terminal.send_over(handle, menu_text)
+            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+            terminal.focus_prev(context)
+
+        else:
+
+            local_object.menu_highlighted_index -= 1
+            menu_text = graphics.render_explorer_info_menu(local_object)
+            terminal.send_over(handle, menu_text)
+            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
 
 
 
     keycallback = terminal.KeyCallback()
     keycallback.register_key("enter", enter_pressed)
     keycallback.register_key(context.settings.enter_alternative_key, enter_pressed)
-    keycallback.register_key("w", switch_focus)
-    keycallback.register_key("s", switch_focus)
-    keycallback.register_key("a", prev_page)
-    keycallback.register_key("d", next_page)
+    keycallback.register_key("a", switch_focus)
+    keycallback.register_key("d", switch_focus)
+    keycallback.register_key("w", prev_page)
+    keycallback.register_key("s", next_page)
 
     while not local_object.quit:
 

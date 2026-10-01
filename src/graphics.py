@@ -12,6 +12,15 @@ import time
 import io
 import sys
 
+HIGHLIGHT_COLOR = (255, 255, 0)
+#for highlighting the current option
+def render_highlighted(context, text):
+
+    text = terminal.render_centered(context, text)
+    text = terminal.text_rgb_string(*HIGHLIGHT_COLOR) + text + terminal.color_reset_string()
+
+    return text
+
 class NewPage:
 
 
@@ -310,7 +319,7 @@ def print_explorer_with_description(local_object):
         full_text = [(terminal.text_rgb_string(*explorer_ref.name_color), False), *name_rendered, (terminal.color_reset_string(), False), ("\n" * 2, False),  (image_rendered, True),
                     ("\n"*2, False),
                     (lives_text, False), (inventory_size_text, False), ("\n"*2, False),
-                    (bottom_text_rendered, False), ("E"*10000, False)]
+                    (bottom_text_rendered, False)]
 
         pages = terminal.paginate_text(context, full_text,  bottom_margin=4)
 
@@ -330,3 +339,37 @@ def print_explorer_with_description(local_object):
         print(text_to_print)
         print(distance)
         terminal.print_centered(bottom_string)
+
+def render_explorer_info_menu(local_object):
+
+    menu = [
+                "Starter Cards",
+                "Starter Packs",
+                "Starter Supporters",
+                "Starter Blueprints",
+                "Starter Items",
+                "Starter Buildings",
+                "Starter Villagers"
+
+                ]
+
+    local_object.menu_highlighted_index %= len(menu)
+
+    text = ""
+
+    #adding codec
+    text += terminal.codec(terminal.ZOOM_TO_CODEC, [local_object.menu_zoom, 20])
+    local_object.menu_zoom_diff = 20 - local_object.menu_zoom
+    local_object.menu_zoom = 20
+
+    for i in range(len(menu)):
+
+        if i == local_object.menu_highlighted_index and not local_object.left_focused:
+
+            text += render_highlighted(local_object.context, menu[i])+"\n"
+
+        else:
+
+            text += menu[i]+"\n"*2
+
+    return text

@@ -57,6 +57,17 @@ VK_SUBTRACT = 0x6D
 
 VK_L = 0x4C
 
+#Codecs for the second terminal
+CODEC_START = "<>"*5
+CODEC_PARAMETER_SEPARATOR = "/" * 5
+
+#zoom codecs
+ZOOM_IN_CODEC = "ZOOM_IN"
+ZOOM_OUT_CODEC = "ZOOM_OUT"
+
+ZOOM_TO_CODEC = "ZOOM_TO_CONTEXT"
+
+
 BUFFER_TIME = 0.01
 FIRST_PRINTED_LINE = None
 
@@ -65,9 +76,25 @@ HANDLES = {}
 
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
+ZOOM_TIME_SLEEP = 0.15
+
 text_rgb_string = lambda r, g, b: f"\033[38;2;{r};{g};{b}m"
 background_rgb_string = lambda r, g, b: f"\033[48;2;{r};{g};{b}m"
 color_reset_string = lambda: "\033[0m"
+
+clear_string = lambda: "\x1b[2J\x1b[H"
+
+def render_centered(context, text):
+    terminal_width = shutil.get_terminal_size().columns
+
+    if (context.splitscreen_state == SplitscreenState.SPLIT_HORIZONTALLY):
+
+        terminal_width = terminal_width // 2
+
+    return "\n".join(
+        line.center(terminal_width)
+        for line in text.splitlines()
+    )
 
 class RECT(ctypes.Structure):
     _fields_ = [
@@ -310,6 +337,7 @@ def send_over(handle, text):
                 f.write(text)
                 f.write("\n")
             opened = True
+            time.sleep(0.1)
         except:
             pass
 
@@ -577,10 +605,10 @@ def zoom_to_no_context(prev_zoom, zoom, buffer_t=0.05):
     zoom = zoom - prev_zoom
 
     if zoom > 0:
-        zoom_in(context, zoom, buffer_time)
+        zoom_in_no_context(zoom, buffer_t)
 
     elif zoom < 0:
-        zoom_out(context, -zoom, buffer_time)
+        zoom_out(-zoom, buffer_t)
 
 
 def zoom_in(context, n, buffer_time=0.15):
@@ -776,6 +804,13 @@ def hide_cursor(context):
 def show_cursor(context):
     print("\033[?25h", end="")
     context.cursor_visible = True
+
+def hide_cursor_no_context():
+    print("\033[?25l", end="")
+
+
+def show_cursor_no_context():
+    print("\033[?25h", end="")
 
 
 
@@ -1037,6 +1072,76 @@ def paginate_text(context, texts, bottom_margin=0):
         pages.append("")
 
     return pages
+
 """
-ascii fonts
+codecs
 """
+
+def codec(codec_id, params=None):
+
+    cc = ""
+
+    cc += CODEC_START
+    cc += codec_id
+
+    if params is not None:
+        for param in params:
+
+            cc += CODEC_PARAMETER_SEPARATOR
+            cc += str(param)
+
+    cc += "\n"
+
+    return cc
+
+
+def process_zoom_in_codec(parameters):
+
+    amount = int(parameters[0].strip())
+    func = lambda: zoom_in_no_context(amount)
+
+    return func
+
+def process_zoom_out_codec(parameters):
+
+    amount = int(parameters[0].strip())
+    func = lambda: zoom_out_no_context(amount)
+
+    return func
+
+def process_zoom_to_codec(parameters):
+
+    prev = int(parameters[0].strip())
+    post = int(parameters[1].strip())
+    func = lambda: zoom_to_no_context(prev, post)
+
+    return func
+
+def process_codec(line):
+    #returns [None if it was a codec, else the original line,
+                #the function to be executed]
+
+    back = ["", lambda: None]
+
+    if line.startswith(CODEC_START):
+
+        line = line[len(CODEC_START):]
+        split_line = line.split(CODEC_PARAMETER_SEPARATOR)
+        codec = split_line[0]
+        split_line = split_line[1:]
+
+        func = lambda: None
+
+        if codec == ZOOM_IN_CODEC:
+            func = process_zoom_in_codec(split_line)
+        elif codec == ZOOM_OUT_CODEC:
+            func = process_zoom_out_codec(split_line)
+        elif codec == ZOOM_TO_CODEC:
+            func = process_zoom_to_codec(split_line)
+
+        back[1] = func
+
+    else:
+        back[0] = line
+
+    return back
