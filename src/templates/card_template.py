@@ -43,3 +43,6 @@ class Card_Template(ABC):
         Returns an Activation Result
         """
         pass
+
+    def get_data_object(self):
+        pass
