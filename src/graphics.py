@@ -349,7 +349,7 @@ def render_explorer_info_menu(local_object):
                 "Starter Blueprints",
                 "Starter Items",
                 "Starter Buildings",
-                "Starter Villagers"
+                "Starter Villagers",
 
                 ]
 
@@ -358,9 +358,9 @@ def render_explorer_info_menu(local_object):
     text = ""
 
     #adding codec
-    text += terminal.codec(terminal.ZOOM_TO_CODEC, [local_object.menu_zoom, 20])
-    local_object.menu_zoom_diff = 20 - local_object.menu_zoom
-    local_object.menu_zoom = 20
+    codecs = terminal.codec(terminal.ZOOM_TO_CODEC, [local_object.menu_zoom, 18])
+    local_object.menu_zoom_diff = 18 - local_object.menu_zoom
+    local_object.menu_zoom = 18
 
     for i in range(len(menu)):
 
@@ -372,4 +372,6 @@ def render_explorer_info_menu(local_object):
 
             text += menu[i]+"\n"*2
 
-    return text
+    fulltext = codecs + text
+
+    return fulltext

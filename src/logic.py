@@ -95,6 +95,24 @@ class Clock:
 
         return (time.perf_counter() * 10E6) - self.start_time
 
+class WaitForZoom:
+
+    def __init__(self, context):
+        self.context = context
+        self.prev_zoom = 0
+
+    def __enter__(self):
+
+        self.prev_zoom = self.context.current_zoom
+
+    def __exit__(self, exc_type, exc_value, traceback):
+
+        diff = abs(self.context.current_zoom - self.prev_zoom)
+        time.sleep(diff * terminal.ZOOM_TIME_SLEEP)
+
+        return False
+
+
 def intro(gamestatehandler):
 
     context = gamestatehandler.context
@@ -702,11 +720,13 @@ def choose_explorer(gamestatehandler):
 
         context = local_object.context
         if local_object.current_state == local_object.explorer_preview:
-            terminal.zoom_to(context, -1)
-            graphics.print_explorer(local_object)
+            with WaitForZoom(context):
+                terminal.zoom_to(context, -1)
+                graphics.print_explorer(local_object)
         elif local_object.current_state == local_object.explorer_hd:
-            terminal.zoom_to(context, -10)
-            graphics.print_ultra_hd_explorer(local_object)
+            with WaitForZoom(context):
+                terminal.zoom_to(context, -10)
+                graphics.print_ultra_hd_explorer(local_object)
 
     def toggle_explorer_hd_and_print(key, local_object):
 
