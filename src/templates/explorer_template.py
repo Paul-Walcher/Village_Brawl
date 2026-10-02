@@ -20,7 +20,11 @@ class Explorer_Template(ABC):
                         starting_items: dict = None,
                         starting_supporters: dict = None,
                         starting_cards: dict = None,
-                        starting_packs: dict = None):
+                        starting_blueprints: dict = None,
+                        starting_packs: dict = None,
+                        starting_buildings: dict = None,
+                        starting_villagers: dict = None
+                        ):
 
         #name
         self.name = name
@@ -41,10 +45,16 @@ class Explorer_Template(ABC):
         #starting cards
         #{card_enum: amount}
         self.starting_cards = (starting_cards if starting_cards is not None else {})
+        #blueprints, {card_enum: amount}
+        self.starting_blueprints = (starting_blueprints if starting_blueprints is not None else {})
         #starting_packs
         #starting packs. these need to be the enums from pack_mappings
         #starting packs are {name_enum: amount}
         self.starting_packs = (starting_packs if starting_packs is not None else {})
+        #buildings
+        self.starting_buildings = (starting_buildings if starting_buildings is not None else {})
+        #villagers
+        self.starting_villagers = (starting_villagers if starting_villagers is not None else {})
         #stats
         #lives
         self.lives = lives

@@ -722,11 +722,11 @@ def choose_explorer(gamestatehandler):
         if local_object.current_state == local_object.explorer_preview:
             with WaitForZoom(context):
                 terminal.zoom_to(context, -1)
-                graphics.print_explorer(local_object)
+            graphics.print_explorer(local_object)
         elif local_object.current_state == local_object.explorer_hd:
             with WaitForZoom(context):
                 terminal.zoom_to(context, -10)
-                graphics.print_ultra_hd_explorer(local_object)
+            graphics.print_ultra_hd_explorer(local_object)
 
     def toggle_explorer_hd_and_print(key, local_object):
 

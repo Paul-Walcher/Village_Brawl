@@ -76,7 +76,7 @@ HANDLES = {}
 
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
-ZOOM_TIME_SLEEP = 0.18
+ZOOM_TIME_SLEEP = 0.25
 
 text_rgb_string = lambda r, g, b: f"\033[38;2;{r};{g};{b}m"
 background_rgb_string = lambda r, g, b: f"\033[48;2;{r};{g};{b}m"

@@ -34,7 +34,11 @@ class Basic_Explorer(Explorer_Template):
         self.starting_items = {}
         self.starting_supporters = {}
         self.starting_cards = {}
+        self.starting_blueprints = {}
         self.starting_packs = {}
+
+        self.starting_buildings = {}
+        self.starting_villagers = {}
 
     def activate_ability(self, phase, context):
         pass

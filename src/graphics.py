@@ -252,6 +252,7 @@ def print_ultra_hd_explorer(local_object):
     name_color = explorer_ref.name_color
     image = explorer_ref.card_image_path
 
+    terminal.clear()
     print_ultra_hd_image(context, image)
 
 
@@ -342,14 +343,26 @@ def print_explorer_with_description(local_object):
 
 def render_explorer_info_menu(local_object):
 
+    context = local_object.context
+
+    explorer_ref = context.modules.explorer_mappings[local_object.explorer_enum]
+
+    num_cards = sum(list(explorer_ref.starting_cards.values()))
+    num_packs = sum(list(explorer_ref.starting_packs.values()))
+    num_supporters = sum(list(explorer_ref.starting_supporters.values()))
+    num_items = sum(list(explorer_ref.starting_items.values()))
+    num_blueprints = sum(list(explorer_ref.starting_blueprints.values()))
+    num_buildings =  sum(list(explorer_ref.starting_buildings.values()))
+    num_villagers = sum(list(explorer_ref.starting_villagers.values()))
+
     menu = [
-                "Starter Cards",
-                "Starter Packs",
-                "Starter Supporters",
-                "Starter Blueprints",
-                "Starter Items",
-                "Starter Buildings",
-                "Starter Villagers",
+                "Starter Cards" + f" ({num_cards})",
+                "Starter Blueprints" + f" ({num_blueprints})",
+                "Starter Packs" + f" ({num_packs})",
+                "Starter Supporters" + f" ({num_supporters})",
+                "Starter Items" + f" ({num_items})",
+                "Starter Buildings" + f" ({num_buildings})",
+                "Starter Villagers" + f" ({num_villagers})",
 
                 ]
 
