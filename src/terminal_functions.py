@@ -17,6 +17,7 @@ import sys
 import colorsys
 import msvcrt
 import numpy as np
+from enum import Enum, auto
 
 from wcwidth import wcswidth, wcwidth, center
 import pyfiglet
@@ -69,14 +70,24 @@ ZOOM_TO_CODEC = "ZOOM_TO_CONTEXT"
 
 
 BUFFER_TIME = 0.01
+ZOOM_BUFFER_TIME = 0.3
 FIRST_PRINTED_LINE = None
+
+ZOOM_IN_1 = "ctrl+f1"
+ZOOM_IN_3 = "ctrl+f2"
+ZOOM_IN_5 = "ctrl+f3"
+ZOOM_IN_10 = "ctrl+f4"
+ZOOM_OUT_1 = "ctrl+shift+f1"
+ZOOM_OUT_3 = "ctrl+shift+f2"
+ZOOM_OUT_5 = "ctrl+shift+f3"
+ZOOM_OUT_10 = "ctrl+shift+f4"
+
 
 TERMINAL_ID = 1
 HANDLES = {}
 
 ANSI_ESCAPE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
-ZOOM_TIME_SLEEP = 0.25
 
 text_rgb_string = lambda r, g, b: f"\033[38;2;{r};{g};{b}m"
 background_rgb_string = lambda r, g, b: f"\033[48;2;{r};{g};{b}m"
@@ -95,6 +106,7 @@ def render_centered(context, text):
         line.center(terminal_width)
         for line in text.splitlines()
     )
+
 
 class RECT(ctypes.Structure):
     _fields_ = [
@@ -587,20 +599,50 @@ def press_zoom_key(key, hold_time=0.02, after_time=0.15):
     keyboard.release("ctrl")
     time.sleep(after_time)
 
-def zoom_in_no_context(n, buffer_time=0.15):
-    for _ in range(n):
-        press_zoom_key("+", after_time=buffer_time)
+def zoom_in_no_context(n, buffer_t=ZOOM_BUFFER_TIME):
+    zoomed = n
+    while zoomed >= 10:
+        keyboard.press_and_release(ZOOM_IN_10)
+        time.sleep(buffer_t)
+        zoomed -= 10
+    while zoomed >= 5:
+        keyboard.press_and_release(ZOOM_IN_5)
+        time.sleep(buffer_t)
+        zoomed -= 5
+    while zoomed >= 3:
+        keyboard.press_and_release(ZOOM_IN_3)
+        time.sleep(buffer_t)
+        zoomed -= 3
+    while zoomed >= 1:
+        keyboard.press_and_release(ZOOM_IN_1)
+        time.sleep(buffer_t)
+        zoomed -= 1
 
-def zoom_out_no_context(n, buffer_time=0.15):
-    for _ in range(n):
-        press_zoom_key("-", after_time=buffer_time)
+def zoom_out_no_context(n, buffer_t=ZOOM_BUFFER_TIME):
+    zoomed = n
+    while zoomed >= 10:
+        keyboard.press_and_release(ZOOM_OUT_10)
+        time.sleep(buffer_t)
+        zoomed -= 10
+    while zoomed >= 5:
+        keyboard.press_and_release(ZOOM_OUT_5)
+        time.sleep(buffer_t)
+        zoomed -= 5
+    while zoomed >= 3:
+        keyboard.press_and_release(ZOOM_OUT_3)
+        time.sleep(buffer_t)
+        zoomed -= 3
+    while zoomed >= 1:
+        keyboard.press_and_release(ZOOM_OUT_1)
+        time.sleep(buffer_t)
+        zoomed -= 1
 
-def reset_zoom_no_context(buffer_time=0.5):
+def reset_zoom_no_context(buffer_time=ZOOM_BUFFER_TIME):
     keyboard.press_and_release("ctrl+0")
     time.sleep(buffer_time)
 
 
-def zoom_to_no_context(prev_zoom, zoom, buffer_t=0.05):
+def zoom_to_no_context(prev_zoom, zoom, buffer_t=ZOOM_BUFFER_TIME):
 
     zoom = zoom - prev_zoom
 
@@ -611,27 +653,58 @@ def zoom_to_no_context(prev_zoom, zoom, buffer_t=0.05):
         zoom_out(-zoom, buffer_t)
 
 
-def zoom_in(context, n, buffer_time=0.15):
-    for _ in range(n):
-        press_zoom_key("+", after_time=buffer_time)
+def zoom_in(context, n, buffer_t=ZOOM_BUFFER_TIME):
+
+    zoomed = n
+    while zoomed >= 10:
+        keyboard.press_and_release(ZOOM_IN_10)
+        time.sleep(buffer_t)
+        zoomed -= 10
+    while zoomed >= 5:
+        keyboard.press_and_release(ZOOM_IN_5)
+        time.sleep(buffer_t)
+        zoomed -= 5
+    while zoomed >= 3:
+        keyboard.press_and_release(ZOOM_IN_3)
+        time.sleep(buffer_t)
+        zoomed -= 3
+    while zoomed >= 1:
+        keyboard.press_and_release(ZOOM_IN_1)
+        time.sleep(buffer_t)
+        zoomed -= 1
 
     context.current_zoom += n
 
 
-def zoom_out(context, n, buffer_time=0.15):
-    for _ in range(n):
-        press_zoom_key("-", after_time=buffer_time)
+def zoom_out(context, n, buffer_t=ZOOM_BUFFER_TIME):
+    zoomed = n
+    while zoomed >= 10:
+        keyboard.press_and_release(ZOOM_OUT_10)
+        time.sleep(buffer_t)
+        zoomed -= 10
+    while zoomed >= 5:
+        keyboard.press_and_release(ZOOM_OUT_5)
+        time.sleep(buffer_t)
+        zoomed -= 5
+    while zoomed >= 3:
+        keyboard.press_and_release(ZOOM_OUT_3)
+        time.sleep(buffer_t)
+        zoomed -= 3
+    while zoomed >= 1:
+        keyboard.press_and_release(ZOOM_OUT_1)
+        time.sleep(buffer_t)
+        zoomed -= 1
 
     context.current_zoom -= n
 
-def reset_zoom(context, buffer_time=0.5):
+def reset_zoom(context, buffer_time=ZOOM_BUFFER_TIME):
     keyboard.press_and_release("ctrl+0")
     time.sleep(buffer_time)
 
     context.current_zoom = 0
 
 
-def zoom_to(context, zoom, buffer_time=0.05):
+def zoom_to(context, zoom, buffer_time=ZOOM_BUFFER_TIME):
 
     #reset_zoom(context)
 

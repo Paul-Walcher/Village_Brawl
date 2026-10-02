@@ -95,23 +95,6 @@ class Clock:
 
         return (time.perf_counter() * 10E6) - self.start_time
 
-class WaitForZoom:
-
-    def __init__(self, context):
-        self.context = context
-        self.prev_zoom = 0
-
-    def __enter__(self):
-
-        self.prev_zoom = self.context.current_zoom
-
-    def __exit__(self, exc_type, exc_value, traceback):
-
-        diff = abs(self.context.current_zoom - self.prev_zoom)
-        time.sleep(diff * terminal.ZOOM_TIME_SLEEP)
-
-        return False
-
 
 def intro(gamestatehandler):
 
@@ -140,6 +123,8 @@ def intro(gamestatehandler):
     gamestatehandler.state_stack.pop()
     #pushing new state
     gamestatehandler.state_stack.push(Gamestates.NEW_GAME_OR_LOAD_SAVE)
+
+    time.sleep(1)
 
 def finish(gamestatehandler):
 
@@ -575,7 +560,7 @@ def explorer_info(gamestatehandler, explorer_enum):
     terminal.focus_next(context)
     menu_text = graphics.render_explorer_info_menu(local_object)
     terminal.send_over(handle, menu_text)
-    time.sleep(terminal.ZOOM_TIME_SLEEP * local_object.menu_zoom)
+    time.sleep(3)
     terminal.focus_prev(context)
 
 
@@ -594,13 +579,13 @@ def explorer_info(gamestatehandler, explorer_enum):
             terminal.focus_next(context)
             menu_text = graphics.render_explorer_info_menu(local_object)
             terminal.send_over(handle, menu_text)
-            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+            time.sleep(0.05)
             terminal.focus_prev(context)
         else:
             terminal.focus_next(local_object.context)
             menu_text = graphics.render_explorer_info_menu(local_object)
             terminal.send_over(handle, menu_text)
-            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+            time.sleep(0.05)
 
 
     def next_page(key, local_object):
@@ -616,7 +601,7 @@ def explorer_info(gamestatehandler, explorer_enum):
             terminal.focus_next(context)
             menu_text = graphics.render_explorer_info_menu(local_object)
             terminal.send_over(handle, menu_text)
-            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+            time.sleep(0.05)
             terminal.focus_prev(context)
 
         else:
@@ -624,7 +609,7 @@ def explorer_info(gamestatehandler, explorer_enum):
             local_object.menu_highlighted_index += 1
             menu_text = graphics.render_explorer_info_menu(local_object)
             terminal.send_over(handle, menu_text)
-            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+            time.sleep(0.05)
 
 
     def prev_page(key, local_object):
@@ -641,7 +626,7 @@ def explorer_info(gamestatehandler, explorer_enum):
             terminal.focus_next(context)
             menu_text = graphics.render_explorer_info_menu(local_object)
             terminal.send_over(handle, menu_text)
-            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+            time.sleep(0.05)
             terminal.focus_prev(context)
 
         else:
@@ -649,7 +634,7 @@ def explorer_info(gamestatehandler, explorer_enum):
             local_object.menu_highlighted_index -= 1
             menu_text = graphics.render_explorer_info_menu(local_object)
             terminal.send_over(handle, menu_text)
-            time.sleep(terminal.ZOOM_TIME_SLEEP * abs(local_object.menu_zoom_diff))
+            time.sleep(0.05)
 
 
 
@@ -720,12 +705,10 @@ def choose_explorer(gamestatehandler):
 
         context = local_object.context
         if local_object.current_state == local_object.explorer_preview:
-            with WaitForZoom(context):
-                terminal.zoom_to(context, -1)
+            terminal.zoom_to(context, -1)
             graphics.print_explorer(local_object)
         elif local_object.current_state == local_object.explorer_hd:
-            with WaitForZoom(context):
-                terminal.zoom_to(context, -10)
+            terminal.zoom_to(context, -19)
             graphics.print_ultra_hd_explorer(local_object)
 
     def toggle_explorer_hd_and_print(key, local_object):
