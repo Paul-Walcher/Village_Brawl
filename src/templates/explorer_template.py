@@ -10,6 +10,7 @@ class Explorer_Template(ABC):
 
     def __init__(self,  name: str = "",
                         name_color: tuple = (255, 255, 255),
+                        explorer_enum = None,
                         description: str = "",
                         ability_name: str = "",
                         card_image_path: str = "",
@@ -30,6 +31,8 @@ class Explorer_Template(ABC):
         self.name = name
         #namecolor, shown in the selection screen
         self.name_color = (255, 255, 255)
+        #the name enum
+        self.explorer_enum = explorer_enum
         #description
         self.description = description
         #card image path
@@ -66,3 +69,9 @@ class Explorer_Template(ABC):
     @abstractmethod
     def activate_ability(self, phase, context):
         pass
+
+    def get_data_object(self):
+        """
+        Gets the starter data object.
+        """
+        data_object = {}

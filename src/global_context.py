@@ -62,6 +62,8 @@ class Gameinfo:
         self.savefile_name = None
         self.current_playset = None
 
+        self.data = {}
+
     def copy(self):
 
         gameinfo_copy = Gameinfo()
@@ -81,25 +83,20 @@ class Modules:
     def __init__(self):
 
         self.explorer_module = None
-        self.explorer_mappings_module = None
-
         #refs
-        self.explorer_mappings = None
         self.explorer_enums = None
+        self.explorer_mappings = None
 
     def create_refs(self):
 
-        if (self.explorer_mappings_module is not None):
-
-            self.explorer_mappings = self.explorer_mappings_module.explorer_mappings
-            self.explorer_enums = self.explorer_mappings_module.ExplorerMappingsEnum
-
+        if self.explorer_module is not None:
+            self.explorer_enums = self.explorer_module.ExplorerEnum
+            self.explorer_mappings = self.explorer_module.explorer_mappings
 
     def copy(self):
 
         modules_copy = Modules()
         modules_copy.explorer_module = self.explorer_module
-        modules_copy.explorer_mappings_module = self.explorer_mappings_module
 
         modules_copy.create_refs()
 

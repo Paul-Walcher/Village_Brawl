@@ -19,8 +19,6 @@ def load_playset(context):
     #loading the explorer
     explorer_module = importlib.import_module(f"{playset_path}.explorer")
     modules.explorer_module = explorer_module
-    explorer_mappings_module = importlib.import_module(f"{playset_path}.explorer_mappings")
-    modules.explorer_mappings_module = explorer_mappings_module
 
     modules.create_refs()
 
