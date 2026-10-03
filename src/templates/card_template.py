@@ -4,8 +4,10 @@ Template for any explorer.
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 
+"""
 class CardTag:
     pass
+"""
 
 class CardInfo:
 
@@ -40,12 +42,12 @@ class Card_Template(ABC):
 
 
     @abstractmethod
-    def activate(self, gameinfo, cardinfo, phase, location):
+    def activate(self, context, cardinfo, phase, location):
         """
         Returns an Activation Result
         """
         pass
 
     @abstractmethod
-    def info(self):
+    def info(self, context):
         pass

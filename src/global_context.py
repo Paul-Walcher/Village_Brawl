@@ -85,6 +85,8 @@ class Modules:
         self.enums_module = None
         #
         self.explorer_module = None
+        #
+        self.mappings_module = None
         #refs
         self.explorer_enums = None
         self.explorer_mappings = None
@@ -93,13 +95,14 @@ class Modules:
 
         if self.explorer_module is not None:
             self.explorer_enums = self.enums_module.ExplorerEnums
-            self.explorer_mappings = self.explorer_module.explorer_mappings
+            self.explorer_mappings = self.mappings_module.explorer_mappings
 
     def copy(self):
 
         modules_copy = Modules()
         modules_copy.explorer_module = self.explorer_module
         modules_copy.enums_module = self.enums_module
+        modules_copy.mappings_module = self.mappings_module
 
         modules_copy.create_refs()
 

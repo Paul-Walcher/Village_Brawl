@@ -111,12 +111,12 @@ class Explorer_Template(ABC):
         self.ability_activation_phases = (ability_activation_phases if ability_activation_phases is not None else [])
 
     @abstractmethod
-    def activate_ability(self, gameinfo, explorer_info, phase):
+    def activate_ability(self, context, explorer_info, phase):
         pass
 
 
     @abstractmethod
-    def info(self):
+    def info(self, context):
         """
         returns the explorer info
         """

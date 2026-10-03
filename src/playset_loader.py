@@ -22,6 +22,9 @@ def load_playset(context):
     #
     explorer_module = importlib.import_module(f"{playset_path}.explorer")
     modules.explorer_module = explorer_module
+    #
+    mappings_module = importlib.import_module(f"{playset_path}.mappings")
+    modules.mappings_module = mappings_module
 
     modules.create_refs()
 

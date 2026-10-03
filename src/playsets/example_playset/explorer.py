@@ -56,7 +56,9 @@ class Basic_Explorer(Explorer_Template):
         self.starting_buildings = {}
         self.starting_villagers = {}
 
-    def info(self):
+    def info(self, context):
+
+        mappings = context.modules.mappings
 
         einfo = ExplorerInfo()
 
@@ -73,6 +75,7 @@ class Basic_Explorer(Explorer_Template):
         #for supporter in self.starting_supporters:
         #   for i in range(self.starting_supporters[supporter]):
         #       einfo.inactive_supporters.append(supporter_module.supporter_mappings[supporter].info())
+        einfo.inactive_supporters = {}
         einfo.deck = deck.Deck()
         einfo.deck_saves = {}
 
@@ -98,9 +101,5 @@ class Basic_Explorer(Explorer_Template):
         return einfo
 
 
-    def activate_ability(self, gameinfo, explorer_info, phase):
+    def activate_ability(self, context, explorer_info, phase):
         pass
-
-explorer_mappings = {
-                        enums.ExplorerEnums.BASIC_EXPLORER: Basic_Explorer()
-                    }

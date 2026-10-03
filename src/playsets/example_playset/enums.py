@@ -6,10 +6,12 @@ class ExplorerEnums(Enum):
     BASIC_EXPLORER = auto()
 
 class CardEnums(Enum):
-    pass
+
+    SMALL_REST = auto()
 
 class ItemEnums(Enum):
-    pass
+
+    REST_MARKER = auto()
 
 class SupporterEnums(Enum):
     pass
