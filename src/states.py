@@ -30,6 +30,14 @@ class ActivationLocation(Enum):
     WAVE_VOID = auto()
     ROUND_VOID = auto()
 
+class ActivationResult(Enum):
+
+    SUCCESS = auto()
+    FAILURE = auto()
+
+    WRONG_PHASE = auto()
+    NOT_ENOUGH_RESOURCES = auto()
+    
 class SplitscreenState(Enum):
 
     NORMAL = auto()

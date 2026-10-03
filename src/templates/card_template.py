@@ -4,21 +4,13 @@ Template for any explorer.
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 
-class ActivationResult(Enum):
-
-    SUCCESS = auto()
-    FAILURE = auto()
-
-    WRONG_PHASE = auto()
-    NOT_ENOUGH_RESOURCES = auto()
-
-class Tag(Enum):
+class CardTag:
     pass
 
 class CardInfo:
 
     def __init__(self):
-        self.data = {}
+        pass
 
 class Card_Template(ABC):
 
@@ -55,8 +47,5 @@ class Card_Template(ABC):
         pass
 
     @abstractmethod
-    def get_initial_cardinfo(self):
-        pass
-
-    def get_data_object(self):
+    def info(self):
         pass

@@ -6,9 +6,10 @@ import importlib
 from enum import Enum, auto
 import constants
 
-from templates.explorer_template import Explorer_Template
+from templates.explorer_template import Explorer_Template, ExplorerInfo
 import terminal_functions as terminal
 import constants
+import deck
 
 playset_path = os.path.dirname(os.path.abspath(__file__))
 playset_name = os.path.basename(playset_path)
@@ -18,6 +19,10 @@ card_asset_path = os.path.join(asset_path, "card_assets")
 
 
 enums = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.enums")
+item_module = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.items")
+supporter_module = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.supporters")
+blueprint_module = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.blueprints")
+pack_module = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.packs")
 
 
 class Basic_Explorer(Explorer_Template):
@@ -45,11 +50,55 @@ class Basic_Explorer(Explorer_Template):
         self.starting_cards = {}
         self.starting_blueprints = {}
         self.starting_packs = {}
+        self.unlocked_packs = {}
+        self.unlockable_packs = {}
 
         self.starting_buildings = {}
         self.starting_villagers = {}
 
-    def activate_ability(self, phase, context):
+    def info(self):
+
+        einfo = ExplorerInfo()
+
+        einfo.explorer_enum = self.explorer_enum
+
+        einfo.lives = self.lives
+        #einfo.inventory = []
+        #for item_ in self.starting_items:
+        #   for i in range(self.starting_items[item_]):
+        #       einfo.inventory.append(item_module.items_mappings[item_].info())
+        einfo.inventory_max_size = self.inventory_size
+        #active supporters
+        #einfo.inactive_supporters = []
+        #for supporter in self.starting_supporters:
+        #   for i in range(self.starting_supporters[supporter]):
+        #       einfo.inactive_supporters.append(supporter_module.supporter_mappings[supporter].info())
+        einfo.deck = deck.Deck()
+        einfo.deck_saves = {}
+
+        einfo.trunk = self.starting_cards.copy()
+        #blueprints
+        #einfo.blueprints = []
+        #for blueprint in self.starting_blueprints:
+        #   for i in range(self.starting_blueprints[blueprint]):
+        #       einfo.blueprints.append(blueprint_module.blueprint_mappings[blueprint].info())
+
+        #packs
+        #einfo.packs = []
+        #for pack in self.starting_packs:
+        #   for i in range(self.starting_packs[pack]):
+        #       einfo.packs.append(pack_module.pack_mappings[pack].info())
+
+        #unlocked packs
+        #einfo.unlocked_packs = self.unlocked_packs.copy()
+
+        #unlockable packs
+        #einfo.unlocked_packs = self.unlockable_packs.copy()
+
+        return einfo
+
+
+    def activate_ability(self, gameinfo, explorer_info, phase):
         pass
 
 explorer_mappings = {
