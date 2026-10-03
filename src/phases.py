@@ -18,6 +18,9 @@ class Phases(Enum):
     BEFORE_ENEMY_ABILITY_ACTIVATION = auto()
     AFTER_ENEMY_ABILITY_ACTIVATION = auto()
 
+    BEFORE_SHUFFLE_INTO_DECK = auto()
+    AFTER_SHUFFLE_INTO_DECK = auto()
+
     #Village
     BEFORE_VILLAGE_PHASE = auto()
     BEFORE_BUILDING_ACTIVATION = auto()

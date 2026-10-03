@@ -21,6 +21,15 @@ class Gamestates(Enum):
     FINISH = auto()
     EXIT = auto()
 
+class ActivationLocation(Enum):
+
+    HAND = auto()
+    FIELD = auto()
+    DISCARD_PILE = auto()
+    VOID = auto()
+    WAVE_VOID = auto()
+    ROUND_VOID = auto()
+
 class SplitscreenState(Enum):
 
     NORMAL = auto()

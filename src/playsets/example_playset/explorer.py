@@ -4,7 +4,7 @@ Explorer definitions
 import os
 import importlib
 from enum import Enum, auto
-
+import constants
 
 from templates.explorer_template import Explorer_Template
 import terminal_functions as terminal
@@ -16,9 +16,9 @@ asset_path = os.path.join(playset_path, "assets")
 standard_asset_path = os.path.join(asset_path, "standard_assets")
 card_asset_path = os.path.join(asset_path, "card_assets")
 
-class ExplorerEnum(Enum):
 
-    BASIC_EXPLORER = auto()
+enums = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.enums")
+
 
 class Basic_Explorer(Explorer_Template):
 
@@ -28,7 +28,7 @@ class Basic_Explorer(Explorer_Template):
 
         self.name = "Basic Explorer"
         self.name_color = (255, 144, 0)
-        self.explorer_enum = ExplorerEnum.BASIC_EXPLORER
+        self.explorer_enum = enums.ExplorerEnums.BASIC_EXPLORER
         self.description = terminal.text_rgb_string(0, 204, 0) + "Basic Explorer. Has no special abilities." + terminal.color_reset_string()
 
         self.ability_name = "-"
@@ -53,5 +53,5 @@ class Basic_Explorer(Explorer_Template):
         pass
 
 explorer_mappings = {
-                        ExplorerEnum.BASIC_EXPLORER: Basic_Explorer()
+                        enums.ExplorerEnums.BASIC_EXPLORER: Basic_Explorer()
                     }
