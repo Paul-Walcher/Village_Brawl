@@ -37,7 +37,7 @@ class ActivationResult(Enum):
 
     WRONG_PHASE = auto()
     NOT_ENOUGH_RESOURCES = auto()
-    
+
 class SplitscreenState(Enum):
 
     NORMAL = auto()

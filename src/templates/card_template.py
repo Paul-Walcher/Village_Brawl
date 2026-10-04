@@ -12,7 +12,9 @@ class CardTag:
 class CardInfo:
 
     def __init__(self):
-        pass
+
+        self.card_enum = None
+        
 
 class Card_Template(ABC):
 
@@ -34,7 +36,7 @@ class Card_Template(ABC):
     self.card_enum = card_enum
     self.description = description
     self.tags = (tags if tags is not None else [])
-    self.standard_selling_reward = (standard_selling_reward if standard_selling_reward is not None else [])
+    self.standard_selling_reward = (standard_selling_reward if standard_selling_reward is not None else {})
     self.card_image_path = card_image_path
     self.standard_image_path = standard_image_path
     self.max_per_deck = max_per_deck

@@ -34,3 +34,15 @@ blueprint_mappings = {
 pack_mappings = {
 
 }
+
+village_mappings = {
+
+}
+
+building_mappings = {
+
+}
+
+villager_mappings = {
+
+}

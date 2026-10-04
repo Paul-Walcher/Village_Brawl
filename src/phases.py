@@ -11,6 +11,7 @@ class Phases(Enum):
     START_OF_WAVE_AFTER_DRAW = auto()
     #gets the information of the card activation, village or explorer
     BEFORE_CARD_ACTIVATION = auto()
+    CARD_ACTIVATION = auto()
     AFTER_CARD_ACTIVATION = auto()
     BEFORE_ENEMY_CARD_ACTIVATION = auto()
     AFTER_ENEMY_CARD_ACTIVATION = auto()

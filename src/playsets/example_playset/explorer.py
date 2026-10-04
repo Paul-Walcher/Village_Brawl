@@ -19,10 +19,6 @@ card_asset_path = os.path.join(asset_path, "card_assets")
 
 
 enums = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.enums")
-item_module = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.items")
-supporter_module = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.supporters")
-blueprint_module = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.blueprints")
-pack_module = importlib.import_module(f"{constants.PLAYSETS_FOLDER}.example_playset.packs")
 
 
 class Basic_Explorer(Explorer_Template):
@@ -47,7 +43,7 @@ class Basic_Explorer(Explorer_Template):
 
         self.starting_items = {}
         self.starting_supporters = {}
-        self.starting_cards = {}
+        self.starting_cards = {enums.CardEnums.SMALL_REST: 20}
         self.starting_blueprints = {}
         self.starting_packs = {}
         self.unlocked_packs = {}
@@ -58,20 +54,20 @@ class Basic_Explorer(Explorer_Template):
 
     def info(self, context):
 
-        mappings = context.modules.mappings
+        mappings = context.modules.mappings_module
 
         einfo = ExplorerInfo()
 
         einfo.explorer_enum = self.explorer_enum
 
         einfo.lives = self.lives
-        #einfo.inventory = []
+        einfo.inventory = []
         #for item_ in self.starting_items:
         #   for i in range(self.starting_items[item_]):
         #       einfo.inventory.append(item_module.items_mappings[item_].info())
         einfo.inventory_max_size = self.inventory_size
         #active supporters
-        #einfo.inactive_supporters = []
+        einfo.inactive_supporters = []
         #for supporter in self.starting_supporters:
         #   for i in range(self.starting_supporters[supporter]):
         #       einfo.inactive_supporters.append(supporter_module.supporter_mappings[supporter].info())
@@ -81,22 +77,22 @@ class Basic_Explorer(Explorer_Template):
 
         einfo.trunk = self.starting_cards.copy()
         #blueprints
-        #einfo.blueprints = []
+        einfo.blueprints = []
         #for blueprint in self.starting_blueprints:
         #   for i in range(self.starting_blueprints[blueprint]):
         #       einfo.blueprints.append(blueprint_module.blueprint_mappings[blueprint].info())
 
         #packs
-        #einfo.packs = []
+        einfo.packs = []
         #for pack in self.starting_packs:
         #   for i in range(self.starting_packs[pack]):
         #       einfo.packs.append(pack_module.pack_mappings[pack].info())
 
         #unlocked packs
-        #einfo.unlocked_packs = self.unlocked_packs.copy()
+        einfo.unlocked_packs = self.unlocked_packs.copy()
 
         #unlockable packs
-        #einfo.unlocked_packs = self.unlockable_packs.copy()
+        einfo.unlocked_packs = self.unlockable_packs.copy()
 
         return einfo
 

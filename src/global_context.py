@@ -62,13 +62,14 @@ class Gameinfo:
         self.savefile_name = None
         self.current_playset = None
 
-        self.data = {}
+        self.game_data = {}
 
     def copy(self):
 
         gameinfo_copy = Gameinfo()
         gameinfo_copy.savefile_name = self.savefile_name
         gameinfo_copy.current_playset = self.current_playset
+        gameinfo_copy.game_data = self.game_data.copy()
 
         return gameinfo_copy
 
@@ -77,6 +78,16 @@ class Gameinfo:
         #savefile name
         self.savefile_name = other_gameinfo.savefile_name
         self.current_playset = other_gameinfo.current_playset
+
+    def start_game(self, context, explorer_enum, village_enum):
+
+        mappings = context.modules.mappings_module
+        explorer_ref = mappings.explorer_mappings[explorer_enum]
+        #village_ref = mappings.village_mappings[village_enum]
+
+        self.game_data["explorer"] = explorer_ref.info(context)
+        #self.game_data["village"] = village_ref.info(context)
+
 
 class Modules:
 
@@ -147,3 +158,7 @@ class Global_Context:
         context_copy.splitscreen_state = self.splitscreen_state
 
         return context_copy
+
+    def start_game(self, explorer_enum, village_enum):
+
+        self.gameinfo.start_game(self, explorer_enum, village_enum)
