@@ -29,6 +29,7 @@ class Settings:
         self.real_image_key = "#"
         self.info_key = "i"
         self.enter_alternative_key = "o"
+        self.reload_key = "shift+f5"
 
     def copy(self):
 
@@ -47,6 +48,7 @@ class Settings:
         settings_copy.real_image_key = self.real_image_key
         settings_copy.info_key = self.info_key
         settings_copy.enter_alternative_key = self.enter_alternative_key
+        settings_copy.reload_key = self.reload_key
 
         return settings_copy
 

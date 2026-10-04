@@ -704,17 +704,15 @@ def reset_zoom(context, buffer_time=ZOOM_BUFFER_TIME):
     context.current_zoom = 0
 
 
-def zoom_to(context, zoom, buffer_time=ZOOM_BUFFER_TIME):
+def zoom_to(context, zoom, buffer_t=ZOOM_BUFFER_TIME):
 
-    #reset_zoom(context)
-
-    zoom = zoom - context.current_zoom
+    reset_zoom(context)
 
     if zoom > 0:
-        zoom_in(context, zoom, buffer_time)
+        zoom_in(context, zoom, buffer_t)
 
     elif zoom < 0:
-        zoom_out(context, -zoom, buffer_time)
+        zoom_out(context, -zoom, buffer_t)
 
 def key_down(vk):
     user32.keybd_event(vk, 0, 0, 0)

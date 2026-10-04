@@ -21,6 +21,8 @@ class Phases(Enum):
 
     BEFORE_SHUFFLE_INTO_DECK = auto()
     AFTER_SHUFFLE_INTO_DECK = auto()
+    BEFORE_CARD_DRAWN = auto()
+    AFTER_CARD_DRAWN = auto()
 
     #Village
     BEFORE_VILLAGE_PHASE = auto()

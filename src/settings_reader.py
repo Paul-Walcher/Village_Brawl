@@ -34,6 +34,7 @@ def read_settings(global_context: Global_Context):
             local_context.settings.real_image_key = data["real_image_key"]
             local_context.settings.info_key = data["info_key"]
             local_context.settings.enter_alternative_key = data["enter_alternative_key"]
+            local_context.settings.reload_key = data["reload_key"]
 
     except Exception as e:
 

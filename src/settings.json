@@ -14,5 +14,6 @@
   "ultra_hd_image_key": "alt",
   "real_image_key": "#",
   "info_key": "i",
-  "enter_alternative_key": "o"
+  "enter_alternative_key": "o",
+  "reload_key": "shift+f5"
 }

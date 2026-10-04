@@ -660,8 +660,8 @@ def choose_explorer(gamestatehandler):
 
     explorers = list(modules.explorer_mappings.keys())
 
-    terminal.clear()
     terminal.zoom_to(context, -1)
+    terminal.clear()
 
     class LocalObject:
 
@@ -674,6 +674,7 @@ def choose_explorer(gamestatehandler):
             self.explorer_index = 0
             self.show_info = False
             self.quit = False
+            self.state_set = False
 
             #img_handle
             self.img_handle = None
@@ -683,6 +684,7 @@ def choose_explorer(gamestatehandler):
             self.explorer_hd = 1
 
             self.current_state = self.explorer_preview
+
 
     local_object = LocalObject()
     local_object.gamestatehandler = gamestatehandler
@@ -708,7 +710,7 @@ def choose_explorer(gamestatehandler):
             terminal.zoom_to(context, -1)
             graphics.print_explorer(local_object)
         elif local_object.current_state == local_object.explorer_hd:
-            terminal.zoom_to(context, -19)
+            terminal.zoom_to(context, -10)
             graphics.print_ultra_hd_explorer(local_object)
 
     def toggle_explorer_hd_and_print(key, local_object):
@@ -748,9 +750,11 @@ def choose_explorer(gamestatehandler):
 
         print_explorer_image(local_object)
 
+    def reload_pressed(key, local_object):
 
-
-
+        local_object.quit = True
+        local_object.gamestatehandler.state_stack.push(states.Gamestates.CHOOSE_EXPLORER)
+        local_object.state_set = True
 
 
     keycallback = terminal.KeyCallback()
@@ -761,9 +765,11 @@ def choose_explorer(gamestatehandler):
     keycallback.register_key("a", a_pressed)
     keycallback.register_key("d", d_pressed)
     keycallback.register_key(context.settings.info_key, show_info_pressed)
+    keycallback.register_key(context.settings.reload_key, reload_pressed)
 
 
     while not local_object.quit:
         keycallback.check_presses(local_object)
 
-    gamestatehandler.state_stack.push(states.Gamestates.FINISH)
+    if not local_object.state_set:
+        gamestatehandler.state_stack.push(states.Gamestates.FINISH)
